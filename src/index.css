@@ -123,11 +123,6 @@
     visibility: hidden;
   }
 
-  /* Alvos do tour: ao rolar até eles, ficam abaixo do cabeçalho fixo. */
-  [data-tour-id] {
-    scroll-margin-top: 5rem;
-  }
-
   ::selection {
     background-color: var(--color-primary);
     color: var(--color-primary-foreground);
