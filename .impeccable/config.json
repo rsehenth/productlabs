@@ -1,0 +1,44 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/features/decisions/decision-detail.tsx"
+        ],
+        "createdAt": "2026-11-07T18:48:41.161Z",
+        "reason": "Relatório 4B.4b: barra lateral intencional distingue a hipótese da decisão em blocos rotulados."
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/features/interactive-case/case-decision-options.tsx"
+        ],
+        "createdAt": "2026-11-07T18:48:41.738Z",
+        "reason": "Relatório 4B.5a: filete azul intencional identifica evidências, com grupos relacionados e demais evidências nomeados no texto."
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/features/interactive-case/case-decision-summary.tsx"
+        ],
+        "createdAt": "2026-11-07T18:48:42.101Z",
+        "reason": "Relatório 4B.5a: filete azul intencional identifica evidências e acompanha o título textual do bloco da síntese."
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/features/overview/demo-dataset-preview.tsx"
+        ],
+        "createdAt": "2026-11-07T18:48:42.416Z",
+        "reason": "Prévia demonstrativa existente: filete editorial marca uma citação fictícia renderizada como figure e blockquote."
+      }
+    ]
+  }
+}

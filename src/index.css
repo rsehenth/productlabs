@@ -1,0 +1,130 @@
+@import 'tailwindcss';
+
+/* Fontes hospedadas localmente (public/fonts): sem requisição externa, o app segue offline. */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('/fonts/plex-sans.woff2') format('woff2');
+  font-weight: 400 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/plex-mono-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/plex-mono-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('/fonts/bricolage-grotesque.woff2') format('woff2');
+  font-weight: 500 700;
+  font-display: swap;
+}
+
+/*
+ * Identidade "caderno de laboratório": tinta quase preta com leve matiz de papel (95) e um único
+ * acento amarelo-marca-texto, a cor que que sublinha a evidência. Figuras e metadados em
+ * mono. Sucesso (verde-azulado), laranja (simulado) e vermelho (erro) ficam longe do acento.
+ */
+@theme {
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, Roboto, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  --color-background: oklch(0.15 0.005 95);
+  --color-foreground: oklch(0.955 0.012 95);
+
+  --color-card: oklch(0.19 0.006 95);
+  --color-card-foreground: oklch(0.955 0.012 95);
+
+  --color-popover: oklch(0.21 0.007 95);
+  --color-popover-foreground: oklch(0.955 0.012 95);
+
+  --color-primary: oklch(0.9 0.17 100);
+  --color-primary-foreground: oklch(0.21 0.04 95);
+
+  --color-secondary: oklch(0.25 0.007 95);
+  --color-secondary-foreground: oklch(0.955 0.012 95);
+
+  --color-muted: oklch(0.225 0.006 95);
+  --color-muted-foreground: oklch(0.73 0.012 95);
+
+  --color-accent: oklch(0.26 0.008 95);
+  --color-accent-foreground: oklch(0.97 0.008 95);
+
+  --color-destructive: oklch(0.63 0.19 25);
+  --color-destructive-foreground: oklch(0.98 0.01 25);
+  /* Fundo sólido do botão destrutivo: texto claro ≥ 4,5:1 (o token acima serve a texto sobre card). */
+  --color-destructive-solid: oklch(0.55 0.19 25);
+
+  --color-success: oklch(0.78 0.13 168);
+
+  --color-simulated: oklch(0.76 0.15 55);
+  --color-simulated-foreground: oklch(0.22 0.04 55);
+
+  --color-border: oklch(0.295 0.008 95);
+  --color-input: oklch(0.34 0.009 95);
+  /* Borda de campos de formulário: ≥ 3:1 sobre o card (WCAG 1.4.11). */
+  --color-field: oklch(0.52 0.012 95);
+  --color-ring: oklch(0.9 0.17 100);
+
+  --color-sidebar: oklch(0.125 0.004 95);
+  --color-sidebar-foreground: oklch(0.955 0.012 95);
+  --color-sidebar-border: oklch(0.235 0.006 95);
+  --color-sidebar-accent: oklch(0.2 0.006 95);
+
+  --color-chart-1: oklch(0.9 0.17 100);
+  --color-chart-2: oklch(0.76 0.11 235);
+  --color-chart-3: oklch(0.74 0.13 320);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-color: oklch(0.36 0.009 95) transparent;
+    scrollbar-width: thin;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100svh;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: 'tnum' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2 {
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  body:has([data-workspace-dialog]) [data-workspace-page-notice] {
+    visibility: hidden;
+  }
+
+  ::selection {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+}
