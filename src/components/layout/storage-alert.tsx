@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { TriangleAlert } from 'lucide-react'
+import { useLanguage } from '@/hooks/use-language'
 import type { WorkspaceLoadStatus } from '@/lib/storage/workspace-storage'
 
 const MESSAGES: Partial<Record<WorkspaceLoadStatus, { title: string; description: string }>> = {
@@ -27,6 +28,7 @@ export function StorageAlert({
   status: WorkspaceLoadStatus
   children?: ReactNode
 }) {
+  const { t } = useLanguage()
   const message = MESSAGES[status]
   if (!message) return null
 
@@ -37,8 +39,8 @@ export function StorageAlert({
     >
       <TriangleAlert className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden="true" />
       <div className="space-y-1">
-        <p className="text-sm font-medium text-foreground">{message.title}</p>
-        <p className="text-sm leading-relaxed text-muted-foreground">{message.description}</p>
+        <p className="text-sm font-medium text-foreground">{t(message.title)}</p>
+        <p className="text-sm leading-relaxed text-muted-foreground">{t(message.description)}</p>
         {children}
       </div>
     </div>

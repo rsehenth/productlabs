@@ -5,6 +5,7 @@ import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Notice } from '@/components/ui/notice'
 import { useFormErrors } from '@/hooks/use-form-errors'
+import { useLanguage } from '@/hooks/use-language'
 import { useWorkspace } from '@/hooks/use-workspace'
 import { METRIC_UNIT_LABELS, formatMetricValue, formatPeriod } from '@/lib/domain-labels'
 import { fieldAria } from '@/lib/field-a11y'
@@ -30,6 +31,7 @@ export function ObservationForm({
   onSaved,
   onSavingChange,
 }: ObservationFormProps) {
+  const { t } = useLanguage()
   const { createObservation, updateObservation } = useWorkspace()
   const [period, setPeriod] = useState(observation?.period ?? currentPeriod())
   const [value, setValue] = useState(
@@ -46,7 +48,7 @@ export function ObservationForm({
 
     const parsed = parseLocaleNumber(value)
     if (parsed === null) {
-      setFieldErrors({ value: 'Informe um número válido.' })
+      setFieldErrors({ value: t('Informe um número válido.') })
       focusError('field')
       return
     }
@@ -77,18 +79,18 @@ export function ObservationForm({
     >
       <h3 className="text-sm font-semibold text-foreground">
         {observation
-          ? `Editar observação de ${formatPeriod(observation.period)}`
-          : 'Nova observação'}
+          ? t('Editar observação de {period}', { period: formatPeriod(observation.period) })
+          : t('Nova observação')}
       </h3>
       {error ? <Notice tone="error" tabIndex={-1}>{error}</Notice> : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field
           id="observation-period"
-          label="Período"
+          label={t('Período')}
           required
           error={fieldErrors.period}
-          hint="Mês de referência."
+          hint={t('Mês de referência.')}
         >
           <Input
             id="observation-period"
@@ -101,7 +103,7 @@ export function ObservationForm({
             }}
             aria-invalid={Boolean(fieldErrors.period)}
             aria-describedby={fieldAria('observation-period', {
-              hint: 'Mês de referência.',
+              hint: t('Mês de referência.'),
               error: fieldErrors.period,
             })}
           />
@@ -109,10 +111,12 @@ export function ObservationForm({
 
         <Field
           id="observation-value"
-          label={`Valor · ${METRIC_UNIT_LABELS[metric.unit]}`}
+          label={t('Valor · {unit}', { unit: METRIC_UNIT_LABELS[metric.unit] })}
           required
           error={fieldErrors.value}
-          hint={`Ex.: ${formatMetricValue(4.5, metric.unit)}. Aceita vírgula decimal.`}
+          hint={t('Ex.: {value}. Aceita vírgula decimal.', {
+            value: formatMetricValue(4.5, metric.unit),
+          })}
         >
           <Input
             id="observation-value"
@@ -125,7 +129,7 @@ export function ObservationForm({
             }}
             aria-invalid={Boolean(fieldErrors.value)}
             aria-describedby={fieldAria('observation-value', {
-              hint: 'Aceita vírgula decimal.',
+              hint: t('Aceita vírgula decimal.'),
               error: fieldErrors.value,
             })}
             autoFocus
@@ -135,10 +139,10 @@ export function ObservationForm({
 
       <div className="flex flex-wrap justify-end gap-2">
         <Button type="button" variant="outline" size="sm" className="max-sm:min-h-11" onClick={onCancel} disabled={saving}>
-          Cancelar
+          {t('Cancelar')}
         </Button>
         <Button type="submit" size="sm" className="max-sm:min-h-11" disabled={saving}>
-          {saving ? 'Salvando…' : 'Salvar observação'}
+          {saving ? t('Salvando…') : t('Salvar observação')}
         </Button>
       </div>
     </form>

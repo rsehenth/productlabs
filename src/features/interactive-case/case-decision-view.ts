@@ -1,5 +1,6 @@
 import type { CaseFeedbackView } from '@/features/interactive-case/case-feedback-view'
 import type { CaseDecisionOption, CaseFeedback, CaseMetric } from '@/types/interactive-case'
+import { t } from '@/lib/i18n'
 
 /**
  * Regras puras da etapa de decisão do Interactive Case.
@@ -105,7 +106,9 @@ export function caseDecisionMissingRequirements(
 export function caseDecisionRequirementMessages(
   requirements: readonly CaseDecisionRequirement[],
 ): string[] {
-  return requirements.map((requirement) => CASE_DECISION_REQUIREMENT_MESSAGES[requirement])
+  return requirements.map((requirement) =>
+    t(CASE_DECISION_REQUIREMENT_MESSAGES[requirement]),
+  )
 }
 
 export interface CaseDecisionEvidenceSplit {

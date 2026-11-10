@@ -4,6 +4,7 @@ import { useContext, type ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { StaleNotice } from '@/components/layout/stale-notice'
 import { StorageAlert } from '@/components/layout/storage-alert'
+import { useLanguage } from '@/hooks/use-language'
 import { WorkspaceContext } from '@/hooks/use-workspace'
 import { cn } from '@/lib/utils'
 
@@ -38,6 +39,7 @@ export function Dialog({
   footer,
   className,
 }: DialogProps) {
+  const { t } = useLanguage()
   const workspace = useContext(WorkspaceContext)
 
   return (
@@ -68,7 +70,7 @@ export function Dialog({
               </DialogPrimitive.Description>
             </div>
             <DialogPrimitive.Close asChild>
-              <Button variant="ghost" size="icon" aria-label="Fechar" className="shrink-0 max-sm:size-11">
+              <Button variant="ghost" size="icon" aria-label={t('Fechar')} className="shrink-0 max-sm:size-11">
                 <X aria-hidden="true" />
               </Button>
             </DialogPrimitive.Close>

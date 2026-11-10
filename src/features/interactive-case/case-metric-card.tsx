@@ -1,6 +1,7 @@
 import { CaseKindTag } from '@/features/interactive-case/case-kind-tag'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useLanguage } from '@/hooks/use-language'
 import { VariationBadge } from '@/features/overview/metric-card'
 import { METRIC_UNIT_LABELS, formatMetricValue, formatPeriod } from '@/lib/domain-labels'
 import {
@@ -10,15 +11,16 @@ import {
 } from '@/features/interactive-case/case-metric-view'
 
 export function CaseMetricCard({ view }: { view: CaseMetricView }) {
+  const { t } = useLanguage()
   return (
     <Card className="h-full border-dashed">
       <CardHeader className="gap-2">
         <CaseKindTag kind="simulated" />
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-base leading-snug">{view.name}</CardTitle>
+          <CardTitle className="text-base leading-snug">{t(view.name)}</CardTitle>
           <Badge variant="outline">{METRIC_UNIT_LABELS[view.unit]}</Badge>
         </div>
-        <p className="text-sm leading-relaxed text-muted-foreground">{view.description}</p>
+        <p className="text-sm leading-relaxed text-muted-foreground">{t(view.description)}</p>
       </CardHeader>
 
       <CardContent className="mt-auto space-y-3">
@@ -26,7 +28,7 @@ export function CaseMetricCard({ view }: { view: CaseMetricView }) {
           <dl className="flex items-end gap-6">
             <div>
               <dt className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground/80">
-                Inicial
+                {t('Inicial')}
               </dt>
               <dd className="font-mono text-lg tabular-nums text-muted-foreground">
                 {formatMetricValue(view.first.value, view.unit)}
@@ -37,7 +39,7 @@ export function CaseMetricCard({ view }: { view: CaseMetricView }) {
             </div>
             <div>
               <dt className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground/80">
-                Final
+                {t('Final')}
               </dt>
               <dd className="font-mono text-[2rem] leading-none font-medium tracking-[-0.05em] tabular-nums text-foreground">
                 {formatMetricValue(view.last.value, view.unit)}
@@ -52,11 +54,11 @@ export function CaseMetricCard({ view }: { view: CaseMetricView }) {
 
         <div className="space-y-0.5 text-xs leading-relaxed text-muted-foreground">
           <p>
-            Variação:{' '}
-            <span className="font-medium text-foreground">
-              {formatCaseVariation(view.unit, view.variation.absolute)}
-            </span>{' '}
-            entre {formatPeriod(view.first.period)} e {formatPeriod(view.last.period)}.
+            {t('Variação: {value} entre {from} e {to}.', {
+              value: formatCaseVariation(view.unit, view.variation.absolute),
+              from: formatPeriod(view.first.period),
+              to: formatPeriod(view.last.period),
+            })}
           </p>
           <p>{caseDirectionInterpretation(view)}</p>
         </div>

@@ -8,6 +8,7 @@ import { Notice } from '@/components/ui/notice'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useFormErrors } from '@/hooks/use-form-errors'
+import { useLanguage } from '@/hooks/use-language'
 import { useWorkspace } from '@/hooks/use-workspace'
 import { dateInputToIso, isoToDateInput } from '@/lib/dates'
 import { FEEDBACK_CATEGORY_LABELS, FEEDBACK_SOURCE_LABELS, METRIC_UNIT_LABELS } from '@/lib/domain-labels'
@@ -32,6 +33,7 @@ export function FeedbackFormDialog({
   onClose,
   onSaved,
 }: FeedbackFormDialogProps) {
+  const { t } = useLanguage()
   const { workspace, createFeedback, updateFeedback } = useWorkspace()
   const [content, setContent] = useState(feedback?.content ?? '')
   const [category, setCategory] = useState<FeedbackCategory>(feedback?.category ?? 'usability')
@@ -55,7 +57,7 @@ export function FeedbackFormDialog({
 
     const receivedAt = dateInputToIso(date)
     if (!receivedAt) {
-      setFieldErrors({ receivedAt: 'Informe uma data válida.' })
+      setFieldErrors({ receivedAt: t('Informe uma data válida.') })
       focusError('field')
       return
     }
@@ -80,16 +82,22 @@ export function FeedbackFormDialog({
       onOpenChange={(open) => {
         if (!open && !saving) onClose()
       }}
-      title={feedback ? 'Editar feedback' : 'Novo feedback'}
-      description="Registre a fala do usuário, uma observação de pesquisa ou um relato de suporte. A classificação é manual."
+      title={feedback ? t('Editar feedback') : t('Novo feedback')}
+      description={t(
+        'Registre a fala do usuário, uma observação de pesquisa ou um relato de suporte. A classificação é manual.',
+      )}
       className="max-w-2xl"
       footer={
         <>
           <Button variant="outline" onClick={onClose} disabled={saving}>
-            Cancelar
+            {t('Cancelar')}
           </Button>
           <Button type="submit" form="feedback-form" disabled={saving}>
-            {saving ? 'Salvando…' : feedback ? 'Salvar alterações' : 'Criar feedback'}
+            {saving
+              ? t('Salvando…')
+              : feedback
+                ? t('Salvar alterações')
+                : t('Criar feedback')}
           </Button>
         </>
       }
@@ -99,10 +107,12 @@ export function FeedbackFormDialog({
 
         <Field
           id="feedback-content"
-          label="Conteúdo"
+          label={t('Conteúdo')}
           required
           error={fieldErrors.content}
-          hint={`Registre o relato nas palavras do usuário. Até ${FIELD_LIMITS.feedbackContent} caracteres.`}
+          hint={t('Registre o relato nas palavras do usuário. Até {max} caracteres.', {
+            max: FIELD_LIMITS.feedbackContent,
+          })}
         >
           <Textarea
             id="feedback-content"
@@ -112,7 +122,9 @@ export function FeedbackFormDialog({
             onChange={(event) => setContent(event.target.value)}
             aria-invalid={Boolean(fieldErrors.content)}
             aria-describedby={fieldAria('feedback-content', {
-              hint: `Registre o relato nas palavras do usuário. Até ${FIELD_LIMITS.feedbackContent} caracteres.`,
+              hint: t('Registre o relato nas palavras do usuário. Até {max} caracteres.', {
+                max: FIELD_LIMITS.feedbackContent,
+              }),
               error: fieldErrors.content,
             })}
             autoFocus
@@ -120,7 +132,7 @@ export function FeedbackFormDialog({
         </Field>
 
         <div className="grid gap-4 sm:grid-cols-3">
-          <Field id="feedback-category" label="Categoria" required error={fieldErrors.category}>
+          <Field id="feedback-category" label={t('Categoria')} required error={fieldErrors.category}>
             <Select
               id="feedback-category"
               value={category}
@@ -135,7 +147,7 @@ export function FeedbackFormDialog({
             </Select>
           </Field>
 
-          <Field id="feedback-source" label="Fonte" required error={fieldErrors.source}>
+          <Field id="feedback-source" label={t('Fonte')} required error={fieldErrors.source}>
             <Select
               id="feedback-source"
               value={source}
@@ -152,7 +164,7 @@ export function FeedbackFormDialog({
 
           <Field
             id="feedback-date"
-            label="Data"
+            label={t('Data')}
             required
             error={fieldErrors.receivedAt}
           >
@@ -174,20 +186,22 @@ export function FeedbackFormDialog({
           aria-describedby={fieldErrors.metricIds ? 'feedback-metrics-error' : undefined}
         >
           <legend className="text-sm font-medium text-foreground">
-            Indicadores relacionados{' '}
-            <span className="font-normal text-muted-foreground">(opcional)</span>
+            {t('Indicadores relacionados')}{' '}
+            <span className="font-normal text-muted-foreground">{t('(opcional)')}</span>
           </legend>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Marque os indicadores que este relato ajuda a investigar. É uma associação manual, não prova causa.
+            {t(
+              'Marque os indicadores que este relato ajuda a investigar. É uma associação manual, não prova causa.',
+            )}
             {metricIds.length > 0 ? (
               <span className="ml-1 font-mono text-foreground">
-                {metricIds.length} selecionado(s).
+                {t('{count} selecionado(s).', { count: metricIds.length })}
               </span>
             ) : null}
           </p>
           {workspace.metrics.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Nenhum indicador cadastrado. Você pode salvar o feedback sem associação.
+              {t('Nenhum indicador cadastrado. Você pode salvar o feedback sem associação.')}
             </p>
           ) : (
             <div className="max-h-44 space-y-1 overflow-y-auto rounded-lg border border-border/70 bg-background/40 p-2">

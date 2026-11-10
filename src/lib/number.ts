@@ -1,4 +1,5 @@
 import type { MetricUnit } from '@/types/domain'
+import { getLanguage, t } from '@/lib/i18n'
 
 export const MAX_ABSOLUTE_VALUE = 1_000_000_000_000
 
@@ -53,21 +54,21 @@ export function parseLocaleNumber(raw: string): number | null {
 }
 
 export function formatEditableNumber(value: number): string {
-  return String(value).replace('.', ',')
+  return getLanguage() === 'pt' ? String(value).replace('.', ',') : String(value)
 }
 
 export function metricValueError(value: number, unit: MetricUnit): string | undefined {
-  if (!Number.isFinite(value)) return 'Informe um número válido.'
-  if (Math.abs(value) > MAX_ABSOLUTE_VALUE) return 'Valor fora do intervalo suportado.'
+  if (!Number.isFinite(value)) return t('Informe um número válido.')
+  if (Math.abs(value) > MAX_ABSOLUTE_VALUE) return t('Valor fora do intervalo suportado.')
   switch (unit) {
     case 'percent':
-      if (value < 0 || value > 100) return 'Percentuais devem ficar entre 0 e 100.'
+      if (value < 0 || value > 100) return t('Percentuais devem ficar entre 0 e 100.')
       return undefined
     case 'count':
-      if (value < 0) return 'Contagens não podem ser negativas.'
+      if (value < 0) return t('Contagens não podem ser negativas.')
       return undefined
     case 'hours':
-      if (value < 0) return 'Horas não podem ser negativas.'
+      if (value < 0) return t('Horas não podem ser negativas.')
       return undefined
     case 'currency':
       return undefined

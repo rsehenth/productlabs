@@ -1,4 +1,5 @@
 import type { WorkspaceState } from '@/types/workspace'
+import { t } from '@/lib/i18n'
 import { metricValueError } from '@/lib/number'
 
 function uniqueIssues(ids: string[], label: string): string[] {
@@ -8,7 +9,9 @@ function uniqueIssues(ids: string[], label: string): string[] {
     if (seen.has(id)) duplicates.add(id)
     seen.add(id)
   }
-  return [...duplicates].map((id) => `${label}: identificador duplicado (${id}).`)
+  return [...duplicates].map((id) =>
+    t('{label}: identificador duplicado ({id}).', { label: t(label), id }),
+  )
 }
 
 export function collectIntegrityIssues(workspace: WorkspaceState): string[] {
@@ -41,15 +44,20 @@ export function collectIntegrityIssues(workspace: WorkspaceState): string[] {
   for (const observation of workspace.observations) {
     const metric = metricsById.get(observation.metricId)
     if (!metric) {
-      issues.push(`Observação ${observation.id}: indicador inexistente.`)
+      issues.push(t('Observação {id}: indicador inexistente.', { id: observation.id }))
     } else {
       const valueError = metricValueError(observation.value, metric.unit)
-      if (valueError) issues.push(`Observação ${observation.id}: ${valueError}`)
+      if (valueError) {
+        issues.push(t('Observação {id}: {error}', { id: observation.id, error: valueError }))
+      }
     }
     const key = `${observation.metricId}:${observation.period}`
     if (periods.has(key)) {
       issues.push(
-        `Indicador ${observation.metricId}: mais de uma observação no período ${observation.period}.`,
+        t('Indicador {metricId}: mais de uma observação no período {period}.', {
+          metricId: observation.metricId,
+          period: observation.period,
+        }),
       )
     }
     periods.add(key)
@@ -57,30 +65,51 @@ export function collectIntegrityIssues(workspace: WorkspaceState): string[] {
 
   for (const feedback of workspace.feedbacks) {
     if (new Set(feedback.metricIds).size !== feedback.metricIds.length) {
-      issues.push(`Feedback ${feedback.id}: indicadores relacionados duplicados.`)
+      issues.push(
+        t('Feedback {id}: indicadores relacionados duplicados.', { id: feedback.id }),
+      )
     }
     for (const id of feedback.metricIds) {
       if (!metricIds.has(id)) {
-        issues.push(`Feedback ${feedback.id}: indicador inexistente (${id}).`)
+        issues.push(
+          t('Feedback {feedbackId}: indicador inexistente ({id}).', {
+            feedbackId: feedback.id,
+            id,
+          }),
+        )
       }
     }
   }
 
   for (const decision of workspace.decisions) {
     if (new Set(decision.metricIds).size !== decision.metricIds.length) {
-      issues.push(`Decisão ${decision.id}: indicadores relacionados duplicados.`)
+      issues.push(
+        t('Decisão {id}: indicadores relacionados duplicados.', { id: decision.id }),
+      )
     }
     if (new Set(decision.feedbackIds).size !== decision.feedbackIds.length) {
-      issues.push(`Decisão ${decision.id}: feedbacks relacionados duplicados.`)
+      issues.push(
+        t('Decisão {id}: feedbacks relacionados duplicados.', { id: decision.id }),
+      )
     }
     for (const id of decision.metricIds) {
       if (!metricIds.has(id)) {
-        issues.push(`Decisão ${decision.id}: indicador inexistente (${id}).`)
+        issues.push(
+          t('Decisão {decisionId}: indicador inexistente ({id}).', {
+            decisionId: decision.id,
+            id,
+          }),
+        )
       }
     }
     for (const id of decision.feedbackIds) {
       if (!feedbackIds.has(id)) {
-        issues.push(`Decisão ${decision.id}: feedback inexistente (${id}).`)
+        issues.push(
+          t('Decisão {decisionId}: feedback inexistente ({id}).', {
+            decisionId: decision.id,
+            id,
+          }),
+        )
       }
     }
   }

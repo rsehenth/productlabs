@@ -4,10 +4,12 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Notice } from '@/components/ui/notice'
 import { StaleNotice } from '@/components/layout/stale-notice'
 import { StorageAlert } from '@/components/layout/storage-alert'
+import { useLanguage } from '@/hooks/use-language'
 import { useWorkspace } from '@/hooks/use-workspace'
 import { downloadTextFile } from '@/lib/download'
 
 export function WorkspaceBanners() {
+  const { t } = useLanguage()
   const { status, saveError, clearSaveError, readRaw, discardStoredData } = useWorkspace()
   const [confirmDiscard, setConfirmDiscard] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
@@ -17,7 +19,7 @@ export function WorkspaceBanners() {
   function exportRaw() {
     const raw = readRaw()
     if (!raw) {
-      setActionError('Não há conteúdo bruto disponível para exportar.')
+      setActionError(t('Não há conteúdo bruto disponível para exportar.'))
       return
     }
     downloadTextFile(
@@ -53,14 +55,14 @@ export function WorkspaceBanners() {
         {blocked ? (
           <div className="flex flex-wrap gap-2 pt-1">
             <Button variant="outline" size="sm" onClick={exportRaw}>
-              Exportar conteúdo bruto
+              {t('Exportar conteúdo bruto')}
             </Button>
             <Button
               variant="destructive"
               size="sm"
               onClick={() => setConfirmDiscard(true)}
             >
-              Descartar dados e iniciar vazio
+              {t('Descartar dados e iniciar vazio')}
             </Button>
           </div>
         ) : null}
@@ -68,7 +70,7 @@ export function WorkspaceBanners() {
 
       {saveError ? (
         <Notice tone="error" onDismiss={clearSaveError}>
-          {saveError}
+          {t(saveError)}
         </Notice>
       ) : null}
 
@@ -78,9 +80,11 @@ export function WorkspaceBanners() {
           onOpenChange={(open) => {
             if (!open) setConfirmDiscard(false)
           }}
-          title="Descartar dados locais inválidos"
-          description="Isto remove o envelope salvo neste navegador. Exporte o conteúdo bruto antes se quiser analisá-lo. A ação não pode ser desfeita."
-          confirmLabel="Descartar dados"
+          title={t('Descartar dados locais inválidos')}
+          description={t(
+            'Isto remove o envelope salvo neste navegador. Exporte o conteúdo bruto antes se quiser analisá-lo. A ação não pode ser desfeita.',
+          )}
+          confirmLabel={t('Descartar dados')}
           onConfirm={handleDiscard}
         />
       ) : null}

@@ -2,6 +2,7 @@ import type { CaseMetric } from '@/types/interactive-case'
 import type { MetricObservation, MetricUnit } from '@/types/domain'
 import { computeVariation, sortObservations } from '@/lib/analytics'
 import type { MetricVariation } from '@/lib/analytics'
+import { t } from '@/lib/i18n'
 import {
   formatAbsoluteVariation,
   formatMetricValue,
@@ -82,34 +83,44 @@ export function formatCaseVariation(unit: MetricUnit, delta: number): string {
 }
 
 export function caseTrendSentence(view: CaseMetricView): string {
+  const name = t(view.name)
   const firstValue = formatMetricValue(view.first.value, view.unit)
   const lastValue = formatMetricValue(view.last.value, view.unit)
   const from = formatPeriod(view.first.period)
   const to = formatPeriod(view.last.period)
-  const periods = `${view.series.length} períodos`
+  const periods = t('{count} períodos', { count: view.series.length })
 
   switch (view.variation.direction) {
     case 'up':
-      return `${view.name}: aumento de ${firstValue} em ${from} para ${lastValue} em ${to}, ao longo de ${periods}.`
+      return t(
+        '{name}: aumento de {firstValue} em {from} para {lastValue} em {to}, ao longo de {periods}.',
+        { name, firstValue, from, lastValue, to, periods },
+      )
     case 'down':
-      return `${view.name}: queda de ${firstValue} em ${from} para ${lastValue} em ${to}, ao longo de ${periods}.`
+      return t(
+        '{name}: queda de {firstValue} em {from} para {lastValue} em {to}, ao longo de {periods}.',
+        { name, firstValue, from, lastValue, to, periods },
+      )
     case 'flat':
-      return `${view.name}: estável em ${firstValue} entre ${from} e ${to}, ao longo de ${periods}.`
+      return t(
+        '{name}: estável em {firstValue} entre {from} e {to}, ao longo de {periods}.',
+        { name, firstValue, from, to, periods },
+      )
   }
 }
 
 export function caseDirectionInterpretation(view: CaseMetricView): string {
   const trend =
     view.variation.direction === 'up'
-      ? 'Tendência de aumento'
+      ? t('Tendência de aumento')
       : view.variation.direction === 'down'
-        ? 'Tendência de queda'
-        : 'Sem variação no intervalo'
+        ? t('Tendência de queda')
+        : t('Sem variação no intervalo')
   const relation =
     view.variation.favorable === null
       ? ''
       : view.variation.favorable
-        ? ', alinhada à direção desejada'
-        : ', oposta à direção desejada'
+        ? t(', alinhada à direção desejada')
+        : t(', oposta à direção desejada')
   return `${trend}${relation}.`
 }

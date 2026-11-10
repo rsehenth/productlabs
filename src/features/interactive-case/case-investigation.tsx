@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useLanguage } from '@/hooks/use-language'
 import { CaseMetricChart } from '@/features/interactive-case/case-metric-chart'
 import {
   caseTrendSentence,
@@ -14,18 +15,19 @@ interface CaseInvestigationProps {
 }
 
 export function CaseInvestigation({ views, selected, onSelect }: CaseInvestigationProps) {
+  const { t } = useLanguage()
   return (
     <section aria-labelledby="case-investigation-title" className="space-y-4">
       <div>
         <h2 id="case-investigation-title" className="text-lg font-semibold text-foreground">
-          Investigação visual
+          {t('Investigação visual')}
         </h2>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Selecione um indicador para explorar sua evolução nos quatro períodos simulados.
+          {t('Selecione um indicador para explorar sua evolução nos quatro períodos simulados.')}
         </p>
       </div>
 
-      <div role="group" aria-label="Selecionar indicador" className="flex flex-wrap gap-2">
+      <div role="group" aria-label={t('Selecionar indicador')} className="flex flex-wrap gap-2">
         {views.map((view) => {
           const isSelected = view.id === selected?.id
           return (
@@ -37,7 +39,7 @@ export function CaseInvestigation({ views, selected, onSelect }: CaseInvestigati
               aria-pressed={isSelected}
               onClick={() => onSelect(view.id)}
             >
-              {view.name}
+              {t(view.name)}
             </Button>
           )
         })}
@@ -53,7 +55,7 @@ export function CaseInvestigation({ views, selected, onSelect }: CaseInvestigati
                 {caseTrendSentence(selected)}
               </p>
               <p className="text-xs leading-relaxed text-muted-foreground">
-                Variação no intervalo:{' '}
+                {t('Variação no intervalo:')}{' '}
                 <span className="font-medium text-foreground">
                   {formatCaseVariation(selected.unit, selected.variation.absolute)}
                 </span>
@@ -61,14 +63,15 @@ export function CaseInvestigation({ views, selected, onSelect }: CaseInvestigati
             </div>
 
             <p className="text-xs leading-relaxed text-muted-foreground/80">
-              Os indicadores podem apresentar tendências simultâneas sem que isso comprove
-              relação causal.
+              {t(
+                'Os indicadores podem apresentar tendências simultâneas sem que isso comprove relação causal.',
+              )}
             </p>
           </CardContent>
         </Card>
       ) : (
         <p className="text-sm text-muted-foreground">
-          Nenhum indicador disponível para investigação.
+          {t('Nenhum indicador disponível para investigação.')}
         </p>
       )}
     </section>

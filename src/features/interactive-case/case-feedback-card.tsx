@@ -1,6 +1,7 @@
 import { CaseKindTag } from '@/features/interactive-case/case-kind-tag'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { useLanguage } from '@/hooks/use-language'
 import { cn } from '@/lib/utils'
 import { FEEDBACK_CATEGORY_LABELS, FEEDBACK_SOURCE_LABELS } from '@/lib/domain-labels'
 import type { CaseFeedbackView } from '@/features/interactive-case/case-feedback-view'
@@ -18,28 +19,29 @@ export function CaseFeedbackCard({
   highlightedMetricId,
   onToggle,
 }: CaseFeedbackCardProps) {
+  const { t } = useLanguage()
   return (
     <Card className={cn('border-dashed', selected && 'border-solid border-primary/50 bg-primary/5')}>
       <CardHeader className="gap-2">
-        <CaseKindTag kind="evidence" note="relato fictício" />
+        <CaseKindTag kind="evidence" note={t('relato fictício')} />
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">{FEEDBACK_CATEGORY_LABELS[view.category]}</Badge>
           <Badge variant="outline">{FEEDBACK_SOURCE_LABELS[view.source]}</Badge>
-          {view.simulated ? <Badge variant="simulated">Dado simulado</Badge> : null}
+          {view.simulated ? <Badge variant="simulated">{t('Dado simulado')}</Badge> : null}
         </div>
       </CardHeader>
 
       <CardContent className="space-y-3">
         <p className="max-w-[60ch] border-l-2 border-chart-2/50 pl-3 text-[15px] leading-relaxed text-foreground">
-          {view.content}
+          {t(view.content)}
         </p>
 
         <div className="space-y-1">
           <p className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground/80">
-            Indicadores relacionados
+            {t('Indicadores relacionados')}
           </p>
           {view.metrics.length === 0 ? (
-            <p className="text-xs text-muted-foreground">Nenhum indicador relacionado.</p>
+            <p className="text-xs text-muted-foreground">{t('Nenhum indicador relacionado.')}</p>
           ) : (
             <ul className="flex flex-wrap gap-2">
               {view.metrics.map((metric) => (
@@ -47,7 +49,7 @@ export function CaseFeedbackCard({
                   <Badge
                     variant={metric.id === highlightedMetricId ? 'default' : 'outline'}
                   >
-                    {metric.name}
+                    {t(metric.name)}
                   </Badge>
                 </li>
               ))}
@@ -68,7 +70,7 @@ export function CaseFeedbackCard({
             checked={selected}
             onChange={() => onToggle(view.id)}
           />
-          {selected ? 'Evidência selecionada' : 'Selecionar evidência'}
+          {selected ? t('Evidência selecionada') : t('Selecionar evidência')}
         </label>
       </CardFooter>
     </Card>

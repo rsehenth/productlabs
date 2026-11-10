@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useFormErrors } from '@/hooks/use-form-errors'
+import { useLanguage } from '@/hooks/use-language'
 import { useWorkspace } from '@/hooks/use-workspace'
 import {
   DECISION_STATUS_RULES,
@@ -43,6 +44,7 @@ interface DecisionFormProps {
 }
 
 export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) {
+  const { t } = useLanguage()
   const { workspace, createDecision, updateDecision } = useWorkspace()
   const [title, setTitle] = useState(initial?.title ?? '')
   const [problem, setProblem] = useState(initial?.problem ?? '')
@@ -147,26 +149,28 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
       {error ? (
         <Notice tone="error" tabIndex={-1}>
           <p>{error}</p>
-          <p>Nada foi salvo. O que você digitou continua neste formulário.</p>
+          <p>{t('Nada foi salvo. O que você digitou continua neste formulário.')}</p>
         </Notice>
       ) : null}
 
       <section aria-labelledby="decision-section-identification" className="space-y-4">
         <div>
           <h2 id="decision-section-identification" className="text-sm font-semibold text-foreground">
-            Contexto
+            {t('Contexto')}
           </h2>
           <p className="text-xs text-muted-foreground">
-            Um registro começa pelo problema que você está tentando resolver.
+            {t('Um registro começa pelo problema que você está tentando resolver.')}
           </p>
         </div>
 
         <Field
           id="decision-title"
-          label="Título da decisão"
+          label={t('Título da decisão')}
           required
           error={fieldErrors.title}
-          hint={`Ex.: Melhorar compreensão dos planos Premium. Até ${FIELD_LIMITS.decisionTitle} caracteres.`}
+          hint={t('Ex.: Melhorar compreensão dos planos Premium. Até {max} caracteres.', {
+            max: FIELD_LIMITS.decisionTitle,
+          })}
         >
           <Input
             id="decision-title"
@@ -174,7 +178,7 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
             onChange={(event) => setTitle(event.target.value)}
             aria-invalid={Boolean(fieldErrors.title)}
             aria-describedby={fieldAria('decision-title', {
-              hint: 'Ex.: Melhorar compreensão dos planos Premium.',
+              hint: t('Ex.: Melhorar compreensão dos planos Premium.'),
               error: fieldErrors.title,
             })}
             autoFocus
@@ -183,10 +187,10 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
 
         <Field
           id="decision-problem"
-          label="Problema investigado"
+          label={t('Problema investigado')}
           required
           error={fieldErrors.problem}
-          hint="Descreva o problema observado. Uma variação de métrica não comprova a causa."
+          hint={t('Descreva o problema observado. Uma variação de métrica não comprova a causa.')}
         >
           <Textarea
             id="decision-problem"
@@ -196,7 +200,7 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
             onChange={(event) => setProblem(event.target.value)}
             aria-invalid={Boolean(fieldErrors.problem)}
             aria-describedby={fieldAria('decision-problem', {
-              hint: 'Descreva o problema observado.',
+              hint: t('Descreva o problema observado.'),
               error: fieldErrors.problem,
             })}
           />
@@ -206,20 +210,22 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
       <section aria-labelledby="decision-section-hypothesis" className="space-y-4 border-t border-border/60 pt-5">
         <div>
           <h2 id="decision-section-hypothesis" className="text-sm font-semibold text-foreground">
-            Hipótese
+            {t('Hipótese')}
           </h2>
           <p className="text-xs text-muted-foreground">
-            Uma hipótese é uma aposta a ser investigada, não uma conclusão validada.
+            {t('Uma hipótese é uma aposta a ser investigada, não uma conclusão validada.')}
           </p>
         </div>
         <Field
           id="decision-hypothesis"
-          label="Hipótese de produto"
+          label={t('Hipótese de produto')}
           required={
             status === 'investigating' || status === 'decided' || status === 'validated'
           }
           error={fieldErrors.hypothesis}
-          hint="Ex.: Uma apresentação mais clara dos benefícios Premium pode reduzir dúvidas na assinatura."
+          hint={t(
+            'Ex.: Uma apresentação mais clara dos benefícios Premium pode reduzir dúvidas na assinatura.',
+          )}
         >
           <Textarea
             id="decision-hypothesis"
@@ -229,7 +235,7 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
             onChange={(event) => setHypothesis(event.target.value)}
             aria-invalid={Boolean(fieldErrors.hypothesis)}
             aria-describedby={fieldAria('decision-hypothesis', {
-              hint: 'Descreva a aposta a ser investigada.',
+              hint: t('Descreva a aposta a ser investigada.'),
               error: fieldErrors.hypothesis,
             })}
           />
@@ -238,12 +244,12 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
 
       <DecisionListSection
         id="decision-alternatives"
-        title="Alternativas consideradas"
-        description="Opções de ação avaliadas antes da escolha. Não são evidências."
+        title={t('Alternativas consideradas')}
+        description={t('Opções de ação avaliadas antes da escolha. Não são evidências.')}
         error={fieldErrors.alternatives}
         items={alternatives}
-        placeholder="Descreva uma alternativa"
-        addLabel="Adicionar alternativa"
+        placeholder={t('Descreva uma alternativa')}
+        addLabel={t('Adicionar alternativa')}
         onAdd={() => addItem(setAlternatives)}
         onRemove={(key) => removeItem(setAlternatives, key)}
         onChange={(key, value) => updateItem(setAlternatives, key, value)}
@@ -252,15 +258,15 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
       <section aria-labelledby="decision-section-decision" className="space-y-4 border-t border-border/60 pt-5">
         <div>
           <h2 id="decision-section-decision" className="text-sm font-semibold text-foreground">
-            Decisão
+            {t('Decisão')}
           </h2>
           <p className="text-xs text-muted-foreground">
-            Descreva a direção escolhida com base nas evidências disponíveis.
+            {t('Descreva a direção escolhida com base nas evidências disponíveis.')}
           </p>
         </div>
         <Field
           id="decision-text"
-          label="Decisão registrada"
+          label={t('Decisão registrada')}
           required={status === 'decided' || status === 'validated'}
           error={fieldErrors.decision}
         >
@@ -278,13 +284,19 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
 
       <DecisionListSection
         id="decision-criteria"
-        title="Critérios de sucesso"
-        requiredNote={status === 'validated' ? 'Obrigatório para o status Validada: registre ao menos um critério.' : undefined}
-        description="Como você saberá se a decisão funcionou. Evite metas automáticas: registre seus próprios critérios."
+        title={t('Critérios de sucesso')}
+        requiredNote={
+          status === 'validated'
+            ? t('Obrigatório para o status Validada: registre ao menos um critério.')
+            : undefined
+        }
+        description={t(
+          'Como você saberá se a decisão funcionou. Evite metas automáticas: registre seus próprios critérios.',
+        )}
         error={fieldErrors.successCriteria}
         items={successCriteria}
-        placeholder="Ex.: Ativação acima de 58% até dezembro"
-        addLabel="Adicionar critério"
+        placeholder={t('Ex.: Ativação acima de 58% até dezembro')}
+        addLabel={t('Adicionar critério')}
         onAdd={() => addItem(setSuccessCriteria)}
         onRemove={(key) => removeItem(setSuccessCriteria, key)}
         onChange={(key, value) => updateItem(setSuccessCriteria, key, value)}
@@ -293,10 +305,12 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
       <section aria-labelledby="decision-section-evidence" className="space-y-4 border-t border-border/60 pt-5">
         <div>
           <h2 id="decision-section-evidence" className="text-sm font-semibold text-foreground">
-            Evidências relacionadas
+            {t('Evidências relacionadas')}
           </h2>
           <p className="text-xs text-muted-foreground">
-            Registros do workspace relacionados ao problema. Um vínculo não estabelece causalidade.
+            {t(
+              'Registros do workspace relacionados ao problema. Um vínculo não estabelece causalidade.',
+            )}
           </p>
         </div>
 
@@ -307,13 +321,14 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
           aria-describedby={fieldErrors.metricIds ? 'decision-metrics-error' : undefined}
         >
           <legend className="text-sm font-medium text-foreground">
-            Indicadores relacionados{' '}
-            <span className="font-normal text-muted-foreground">(opcional)</span>
+            {t('Indicadores relacionados')}{' '}
+            <span className="font-normal text-muted-foreground">{t('(opcional)')}</span>
           </legend>
           {workspace.metrics.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Nenhum indicador cadastrado. Você pode registrar a decisão sem evidências
-              quantitativas.
+              {t(
+                'Nenhum indicador cadastrado. Você pode registrar a decisão sem evidências quantitativas.',
+              )}
             </p>
           ) : (
             <div className="grid max-h-56 grid-cols-1 gap-1 overflow-y-auto rounded-lg border border-border/70 bg-background/40 p-2 sm:grid-cols-2">
@@ -333,10 +348,15 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
                     <span className="min-w-0">
                       <span className="block break-words text-sm text-foreground">{metric.name}</span>
                       <span className="block text-xs text-muted-foreground">
-                        {METRIC_UNIT_LABELS[metric.unit]}
                         {latest
-                          ? ` · ${formatMetricValue(latest.value, metric.unit)} em ${latest.period}`
-                          : ' · sem observações'}
+                          ? t('{unit} · {value} em {period}', {
+                              unit: METRIC_UNIT_LABELS[metric.unit],
+                              value: formatMetricValue(latest.value, metric.unit),
+                              period: latest.period,
+                            })
+                          : t('{unit} · sem observações', {
+                              unit: METRIC_UNIT_LABELS[metric.unit],
+                            })}
                       </span>
                     </span>
                   </label>
@@ -358,21 +378,22 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
           aria-describedby={fieldErrors.feedbackIds ? 'decision-feedbacks-error' : undefined}
         >
           <legend className="text-sm font-medium text-foreground">
-            Feedbacks relacionados{' '}
+            {t('Feedbacks relacionados')}{' '}
             <span className="font-normal text-muted-foreground">
-              (opcional · {feedbackIds.length} selecionado(s))
+              {t('(opcional · {count} selecionado(s))', { count: feedbackIds.length })}
             </span>
           </legend>
           {workspace.feedbacks.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Nenhum feedback cadastrado. Registre relatos na área Feedbacks para usá-los como
-              evidência.
+              {t(
+                'Nenhum feedback cadastrado. Registre relatos na área Feedbacks para usá-los como evidência.',
+              )}
             </p>
           ) : (
             <>
               <div>
                 <label htmlFor="decision-feedback-search" className="sr-only">
-                  Pesquisar feedbacks
+                  {t('Pesquisar feedbacks')}
                 </label>
                 <div className="relative">
                   <Search
@@ -382,7 +403,7 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
                   <Input
                     id="decision-feedback-search"
                     className="pl-9"
-                    placeholder="Pesquisar feedbacks por conteúdo ou categoria"
+                    placeholder={t('Pesquisar feedbacks por conteúdo ou categoria')}
                     value={feedbackSearch}
                     onChange={(event) => setFeedbackSearch(event.target.value)}
                   />
@@ -391,7 +412,7 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
               <div className="max-h-56 space-y-1 overflow-y-auto rounded-lg border border-border/70 bg-background/40 p-2">
                 {filteredFeedbacks.length === 0 ? (
                   <p className="px-2 py-2 text-sm text-muted-foreground">
-                    Nenhum feedback corresponde à pesquisa.
+                    {t('Nenhum feedback corresponde à pesquisa.')}
                   </p>
                 ) : (
                   filteredFeedbacks.map((feedback) => (
@@ -430,12 +451,12 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
 
       <DecisionListSection
         id="decision-next-steps"
-        title="Próximos passos"
-        description="Lista simples de ações. Não é um gerenciador de tarefas."
+        title={t('Próximos passos')}
+        description={t('Lista simples de ações. Não é um gerenciador de tarefas.')}
         error={fieldErrors.nextSteps}
         items={nextSteps}
-        placeholder="Ex.: Revisar a apresentação dos planos"
-        addLabel="Adicionar próximo passo"
+        placeholder={t('Ex.: Revisar a apresentação dos planos')}
+        addLabel={t('Adicionar próximo passo')}
         onAdd={() => addItem(setNextSteps)}
         onRemove={(key) => removeItem(setNextSteps, key)}
         onChange={(key, value) => updateItem(setNextSteps, key, value)}
@@ -443,11 +464,11 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
 
       <section aria-labelledby="decision-section-status" className="space-y-3 border-t border-border/60 pt-5">
         <h2 id="decision-section-status" className="text-sm font-semibold text-foreground">
-          Status
+          {t('Status')}
         </h2>
         <Field
           id="decision-status"
-          label="Status do registro"
+          label={t('Status do registro')}
           required
           error={fieldErrors.status}
           hint={DECISION_STATUS_RULES[status]}
@@ -470,17 +491,22 @@ export function DecisionForm({ initial, onCancel, onSaved }: DecisionFormProps) 
           </Select>
         </Field>
         <p className="text-xs text-muted-foreground">
-          O status é uma classificação registrada por você. O sistema não valida hipóteses
-          automaticamente.
+          {t(
+            'O status é uma classificação registrada por você. O sistema não valida hipóteses automaticamente.',
+          )}
         </p>
       </section>
 
       <div className="flex flex-wrap justify-end gap-2 border-t border-border/60 pt-4">
         <Button type="button" variant="outline" className="max-sm:min-h-11" onClick={onCancel} disabled={saving}>
-          Cancelar
+          {t('Cancelar')}
         </Button>
         <Button type="submit" className="max-sm:min-h-11" disabled={saving}>
-          {saving ? 'Salvando…' : initial ? 'Salvar alterações' : 'Salvar decisão'}
+          {saving
+            ? t('Salvando…')
+            : initial
+              ? t('Salvar alterações')
+              : t('Salvar decisão')}
         </Button>
       </div>
     </form>
@@ -514,6 +540,7 @@ function DecisionListSection({
   onRemove,
   onChange,
 }: DecisionListSectionProps) {
+  const { t } = useLanguage()
   return (
     <section aria-labelledby={`${id}-title`} className="space-y-3 border-t border-border/60 pt-5">
       <div>
@@ -526,7 +553,7 @@ function DecisionListSection({
 
       <div className="space-y-2">
         {items.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhum item adicionado.</p>
+          <p className="text-sm text-muted-foreground">{t('Nenhum item adicionado.')}</p>
         ) : (
           items.map((item, index) => (
             <div key={item.key} className="flex items-start gap-2">
@@ -535,7 +562,7 @@ function DecisionListSection({
               </span>
               <div className="min-w-0 flex-1">
                 <label htmlFor={`${id}-${item.key}`} className="sr-only">
-                  {title} — item {index + 1}
+                  {t('{title} — item {index}', { title, index: index + 1 })}
                 </label>
                 <Input
                   id={`${id}-${item.key}`}
@@ -552,9 +579,12 @@ function DecisionListSection({
                 variant="ghost"
                 size="sm"
                 onClick={() => onRemove(item.key)}
-                aria-label={`Remover ${title.toLowerCase()} item ${index + 1}`}
+                aria-label={t('Remover {title} item {index}', {
+                  title: title.toLowerCase(),
+                  index: index + 1,
+                })}
               >
-                Remover
+                {t('Remover')}
               </Button>
             </div>
           ))

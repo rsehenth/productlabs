@@ -2,6 +2,7 @@ import { useContext } from 'react'
 import { HardDrive } from 'lucide-react'
 import { BrandMark } from '@/components/layout/brand-mark'
 import { NAV_LIST } from '@/components/layout/navigation'
+import { useLanguage } from '@/hooks/use-language'
 import { WorkspaceContext } from '@/hooks/use-workspace'
 import { cn } from '@/lib/utils'
 import { routeHref, type RouteId } from '@/lib/routing'
@@ -18,10 +19,11 @@ interface SidebarNavProps {
  * costuma andar (indicadores, feedbacks, decisões, caso) e fica acesa até a página atual.
  */
 export function SidebarNav({ route, onNavigate, collapsible = false }: SidebarNavProps) {
+  const { t } = useLanguage()
   const activeIndex = NAV_LIST.findIndex((item) => item.id === route)
 
   return (
-    <nav aria-label="Navegação principal">
+    <nav aria-label={t('Navegação principal')}>
       <ul className="flex flex-col">
         {NAV_LIST.map((item, index) => {
           const active = index === activeIndex
@@ -74,7 +76,7 @@ export function SidebarNav({ route, onNavigate, collapsible = false }: SidebarNa
                     {item.label}
                   </span>
                   <span className="truncate text-xs leading-4 text-muted-foreground/80">
-                    {item.description}
+                    {t(item.description)}
                   </span>
                 </span>
               </a>
@@ -87,18 +89,19 @@ export function SidebarNav({ route, onNavigate, collapsible = false }: SidebarNa
 }
 
 export function SidebarBrand({ collapsible = false }: { collapsible?: boolean }) {
+  const { t } = useLanguage()
   return (
     <a
       href={routeHref('overview')}
       className="flex items-center gap-3 rounded-lg"
-      aria-label="Product Decision Lab — ir para o Overview"
+      aria-label={t('Product Decision Lab — ir para o Overview')}
     >
       <BrandMark />
       <span className={cn('flex flex-col leading-none', collapsible && 'max-lg:hidden')}>
         <span className="font-display text-base font-semibold tracking-tight text-foreground">
           Decision Lab
         </span>
-        <span className="mt-1.5 text-[11px] text-muted-foreground">Evidência → decisão</span>
+        <span className="mt-1.5 text-[11px] text-muted-foreground">{t('Evidência → decisão')}</span>
       </span>
     </a>
   )
@@ -106,11 +109,12 @@ export function SidebarBrand({ collapsible = false }: { collapsible?: boolean })
 
 /** Leitura do workspace com os números reais; sem provider, mostra traços. */
 export function SidebarFooter() {
+  const { t } = useLanguage()
   const workspace = useContext(WorkspaceContext)?.workspace
   const counts = [
-    { label: 'Métricas', value: workspace?.metrics.length },
+    { label: t('Métricas'), value: workspace?.metrics.length },
     { label: 'Feedbacks', value: workspace?.feedbacks.length },
-    { label: 'Decisões', value: workspace?.decisions.length },
+    { label: t('Decisões'), value: workspace?.decisions.length },
   ]
 
   return (
@@ -127,7 +131,7 @@ export function SidebarFooter() {
       </dl>
       <p className="flex items-start gap-2 border-t border-sidebar-border px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
         <HardDrive className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-        Workspace local: os registros ficam só neste navegador.
+        {t('Workspace local: os registros ficam só neste navegador.')}
       </p>
     </div>
   )
@@ -135,7 +139,7 @@ export function SidebarFooter() {
 
 export function Sidebar({ route }: { route: RouteId }) {
   return (
-    <aside className="sticky top-0 hidden h-svh w-16 shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex lg:w-64">
+    <aside data-tour-id="app-nav" className="sticky top-0 hidden h-svh w-16 shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex lg:w-64">
       <div className="flex h-16 items-center px-4 max-lg:justify-center max-lg:px-0">
         <SidebarBrand collapsible />
       </div>

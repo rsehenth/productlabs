@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
+import { useLanguage } from '@/hooks/use-language'
 import { useWorkspace } from '@/hooks/use-workspace'
 import {
   backupFileName,
@@ -23,6 +24,7 @@ interface ExportBackupButtonProps {
 }
 
 export function ExportBackupButton({ label, onExported, onReview }: ExportBackupButtonProps) {
+  const { t } = useLanguage()
   const { workspace } = useWorkspace()
   const { navigate } = useRoute()
   const [warning, setWarning] = useState(false)
@@ -36,7 +38,10 @@ export function ExportBackupButton({ label, onExported, onReview }: ExportBackup
       'application/json;charset=utf-8',
     )
     const compatible = incompatible.length === 0
-    onExported(compatible ? EXPORT_OK_MESSAGE : EXPORT_LEGACY_MESSAGE, compatible)
+    onExported(
+      compatible ? t(EXPORT_OK_MESSAGE) : t(EXPORT_LEGACY_MESSAGE),
+      compatible,
+    )
   }
 
   return (
@@ -53,8 +58,10 @@ export function ExportBackupButton({ label, onExported, onReview }: ExportBackup
           onOpenChange={(open) => {
             if (!open) setWarning(false)
           }}
-          title="Atenção: este backup contém decisões que precisam ser regularizadas"
-          description="Encontramos decisões que não atendem aos requisitos atuais de seus respectivos status. Você ainda pode baixar uma cópia dos seus dados, mas este arquivo não poderá ser restaurado normalmente nesta versão até que as inconsistências sejam corrigidas."
+          title={t('Atenção: este backup contém decisões que precisam ser regularizadas')}
+          description={t(
+            'Encontramos decisões que não atendem aos requisitos atuais de seus respectivos status. Você ainda pode baixar uma cópia dos seus dados, mas este arquivo não poderá ser restaurado normalmente nesta versão até que as inconsistências sejam corrigidas.',
+          )}
           footer={
             <>
               <Button
@@ -65,7 +72,7 @@ export function ExportBackupButton({ label, onExported, onReview }: ExportBackup
                   navigate('decisions')
                 }}
               >
-                Revisar decisões
+                {t('Revisar decisões')}
               </Button>
               <Button
                 onClick={() => {
@@ -73,14 +80,14 @@ export function ExportBackupButton({ label, onExported, onReview }: ExportBackup
                   download()
                 }}
               >
-                Baixar cópia mesmo assim
+                {t('Baixar cópia mesmo assim')}
               </Button>
             </>
           }
         >
           <div className="space-y-3">
             <p className="text-sm font-medium text-foreground">
-              {incompatible.length} decisão(ões) incompatível(is)
+              {t('{count} decisão(ões) incompatível(is)', { count: incompatible.length })}
             </p>
             <ul className="max-h-60 space-y-2 overflow-y-auto">
               {incompatible.map((d) => (
@@ -89,15 +96,16 @@ export function ExportBackupButton({ label, onExported, onReview }: ExportBackup
                   className="rounded-lg border border-border/70 bg-background/40 p-3 text-sm text-muted-foreground"
                 >
                   <p>
-                    <span className="font-medium text-foreground">Decisão:</span> {d.title}
+                    <span className="font-medium text-foreground">{t('Decisão:')}</span> {d.title}
                   </p>
                   <p>
-                    <span className="font-medium text-foreground">Status:</span>{' '}
+                    <span className="font-medium text-foreground">{t('Status:')}</span>{' '}
                     {DECISION_STATUS_LABELS[d.status]}
                   </p>
                   {d.pendencies.map((pendency) => (
                     <p key={pendency}>
-                      <span className="font-medium text-foreground">Pendência:</span> {pendency}
+                      <span className="font-medium text-foreground">{t('Pendência:')}</span>{' '}
+                      {pendency}
                     </p>
                   ))}
                 </li>

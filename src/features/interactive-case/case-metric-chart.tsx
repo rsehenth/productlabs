@@ -9,6 +9,7 @@ import {
   YAxis,
 } from 'recharts'
 import { METRIC_UNIT_LABELS, formatMetricValue, formatPeriod, formatPeriodShort } from '@/lib/domain-labels'
+import { useLanguage } from '@/hooks/use-language'
 import { CaseKindTag } from '@/features/interactive-case/case-kind-tag'
 import {
   caseTrendSentence,
@@ -16,26 +17,28 @@ import {
 } from '@/features/interactive-case/case-metric-view'
 
 export function CaseMetricChart({ view }: { view: CaseMetricView }) {
+  const { t } = useLanguage()
   return (
     <figure className="rounded-lg border border-border/70 bg-background/40 p-4">
       <figcaption className="sr-only">
-        {caseTrendSentence(view)} Períodos observados:{' '}
-        {view.series
-          .map(
-            (point) =>
-              `${formatPeriod(point.period)}: ${formatMetricValue(point.value, view.unit)}`,
-          )
-          .join('; ')}
-        .
+        {t('{trend} Períodos observados: {periods}.', {
+          trend: caseTrendSentence(view),
+          periods: view.series
+            .map(
+              (point) =>
+                `${formatPeriod(point.period)}: ${formatMetricValue(point.value, view.unit)}`,
+            )
+            .join('; '),
+        })}
       </figcaption>
 
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div className="space-y-0.5">
           <CaseKindTag kind="simulated" />
-          <p className="text-xs font-medium text-foreground">{view.name}</p>
+          <p className="text-xs font-medium text-foreground">{t(view.name)}</p>
         </div>
         <span className="text-[11px] text-muted-foreground">
-          Unidade: {METRIC_UNIT_LABELS[view.unit]}
+          {t('Unidade: {unit}', { unit: METRIC_UNIT_LABELS[view.unit] })}
         </span>
       </div>
 
@@ -76,7 +79,7 @@ export function CaseMetricChart({ view }: { view: CaseMetricView }) {
                   typeof value === 'number' ? value : Number(value),
                   view.unit,
                 ),
-                view.name,
+                t(view.name),
               ]}
             />
             <Line
@@ -110,11 +113,11 @@ export function CaseMetricChart({ view }: { view: CaseMetricView }) {
       <div className="mt-2 flex flex-wrap items-center gap-4 text-[11px] text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-chart-1" aria-hidden="true" />
-          Primeira observação
+          {t('Primeira observação')}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-chart-2" aria-hidden="true" />
-          Última observação
+          {t('Última observação')}
         </span>
       </div>
     </figure>

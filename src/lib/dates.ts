@@ -1,6 +1,8 @@
+import { getLanguage, locale } from '@/lib/i18n'
+
 export const ISO_MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/
 
-const MONTHS_LONG = [
+const MONTHS_LONG_PT = [
   'janeiro',
   'fevereiro',
   'março',
@@ -14,6 +16,25 @@ const MONTHS_LONG = [
   'novembro',
   'dezembro',
 ]
+
+const MONTHS_LONG_EN = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
+
+function monthsLong(): string[] {
+  return getLanguage() === 'pt' ? MONTHS_LONG_PT : MONTHS_LONG_EN
+}
 
 export function nowIso(): string {
   return new Date().toISOString()
@@ -48,13 +69,15 @@ export function isoToDateInput(value: string): string {
 export function formatDate(value: string): string {
   const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value)
   if (!match) return value
-  return `${match[3]}/${match[2]}/${match[1]}`
+  return getLanguage() === 'pt'
+    ? `${match[3]}/${match[2]}/${match[1]}`
+    : `${match[2]}/${match[3]}/${match[1]}`
 }
 
 export function formatDateTime(value: string): string {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat(locale(), {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -67,12 +90,16 @@ export function formatPeriodLong(period: string): string {
   if (!isValidIsoMonth(period)) return period
   const year = period.slice(0, 4)
   const month = Number(period.slice(5, 7))
-  return `${MONTHS_LONG[month - 1] ?? period} de ${year}`
+  const label = monthsLong()[month - 1] ?? period
+  return getLanguage() === 'pt' ? `${label} de ${year}` : `${label} ${year}`
 }
 
 export function formatDateLong(value: string): string {
   const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value)
   if (!match) return value
   const month = Number(match[2])
-  return `${Number(match[3])} de ${MONTHS_LONG[month - 1] ?? ''} de ${match[1]}`
+  const label = monthsLong()[month - 1] ?? ''
+  return getLanguage() === 'pt'
+    ? `${Number(match[3])} de ${label} de ${match[1]}`
+    : `${label} ${Number(match[3])}, ${match[1]}`
 }

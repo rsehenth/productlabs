@@ -18,10 +18,10 @@
     "semantic_hash": "a18ad10178644c0bf244f5d51578d1f8"
   },
   "src/App.tsx": {
-    "mtime": 1793959538.6781087,
-    "seen": 1793979985.7363708,
-    "ast_hash": "c156daf33ad8ff6e58250442a21c6ddb",
-    "semantic_hash": "c156daf33ad8ff6e58250442a21c6ddb"
+    "mtime": 1794304837.6625426,
+    "seen": 1794304942.925228,
+    "ast_hash": "25ec0cf24c44989f271d7d4660ac65dd",
+    "semantic_hash": ""
   },
   "src/components/layout/app-header.tsx": {
     "mtime": 1793997492.724103,
@@ -653,18 +653,6 @@
     "ast_hash": "01ed5d72216c5afae0b9cd482511d02a",
     "semantic_hash": "01ed5d72216c5afae0b9cd482511d02a"
   },
-  ".commandcode/taste/taste-\u2014-command-code/taste.md": {
-    "mtime": 1793977916.6138537,
-    "seen": 1793979985.7364464,
-    "ast_hash": "6a8381c26001363b9809f16ee8f3bc92",
-    "semantic_hash": "6a8381c26001363b9809f16ee8f3bc92"
-  },
-  ".commandcode/taste/taste.md": {
-    "mtime": 1793975490.888734,
-    "seen": 1793979985.7364469,
-    "ast_hash": "4bd793c9575cf0d87c063e6317b4c174",
-    "semantic_hash": "4bd793c9575cf0d87c063e6317b4c174"
-  },
   "README.md": {
     "mtime": 1793960971.791994,
     "seen": 1793979985.7364478,
@@ -693,18 +681,6 @@
     "mtime": 1793997715.323163,
     "seen": 1794077238.6350644,
     "ast_hash": "ae84b60ca444317b1b38171a09d15d72",
-    "semantic_hash": ""
-  },
-  ".claude/launch.json": {
-    "mtime": 1793996848.231199,
-    "seen": 1794077238.6347783,
-    "ast_hash": "542a2b15ae49c254c144dc0a020c8988",
-    "semantic_hash": ""
-  },
-  ".impeccable/hook.cache.json": {
-    "mtime": 1794251180.79466,
-    "seen": 1794251225.1103685,
-    "ast_hash": "22d893c17eadff521b614ad245b3aac5",
     "semantic_hash": ""
   },
   "src/components/layout/stale-notice.tsx": {
@@ -927,6 +903,30 @@
     "mtime": 1794251161.779868,
     "seen": 1794251225.1106331,
     "ast_hash": "953c41a3162af40aa5e9474b5c17f7e2",
+    "semantic_hash": ""
+  },
+  "docs/CLOUDFLARE-PAGES-SETUP-4C2.md": {
+    "mtime": 1794253401.297603,
+    "seen": 1794304942.925348,
+    "ast_hash": "1f6e36faed37042a27762bb50426fa58",
+    "semantic_hash": ""
+  },
+  "docs/PRODUCTION-READINESS-AUDIT-4C1.md": {
+    "mtime": 1794253105.8889472,
+    "seen": 1794304942.9253507,
+    "ast_hash": "9d9fa2bfa3ba2b028dc296bb779d83b3",
+    "semantic_hash": ""
+  },
+  "docs/VISUAL-REFINEMENT-4B6B-4.md": {
+    "mtime": 1794252495.6581593,
+    "seen": 1794304942.9253645,
+    "ast_hash": "6d873ee636cae59292bbfe567a2203a8",
+    "semantic_hash": ""
+  },
+  "docs/PERFORMANCE-CODE-SPLITTING-4C3B1.md": {
+    "mtime": 1794304972.942544,
+    "seen": 1794305002.3730483,
+    "ast_hash": "083cb8d9b0621a90a70a66c4ef5eb533",
     "semantic_hash": ""
   },
   "package-lock.json": {

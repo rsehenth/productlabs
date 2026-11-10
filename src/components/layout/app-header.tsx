@@ -1,8 +1,11 @@
 import { useContext, type Ref } from 'react'
-import { HardDrive, Menu } from 'lucide-react'
+import { CircleHelp, HardDrive, Menu } from 'lucide-react'
+import { LanguageToggle } from '@/components/layout/language-toggle'
 import { BrandMark } from '@/components/layout/brand-mark'
 import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/hooks/use-language'
 import { WorkspaceContext } from '@/hooks/use-workspace'
+import { locale, t as translate } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 interface AppHeaderProps {
@@ -10,12 +13,17 @@ interface AppHeaderProps {
   onOpenNav: () => void
   /** Botão do menu móvel: recebe o foco de volta quando a gaveta fecha. */
   menuButtonRef?: Ref<HTMLButtonElement>
+  onStartTour: () => void
+  /** Botão "Como funciona": recebe o foco de volta quando o tour termina. */
+  tourButtonRef?: Ref<HTMLButtonElement>
 }
 
 function savedLabel(savedAt: string | null): string {
   const date = savedAt ? new Date(savedAt) : null
-  if (!date || Number.isNaN(date.getTime())) return 'Salvo neste navegador'
-  return `Salvo às ${date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
+  if (!date || Number.isNaN(date.getTime())) return translate('Salvo neste navegador')
+  return translate('Salvo às {time}', {
+    time: date.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' }),
+  })
 }
 
 type StorageTone = 'ok' | 'warn' | 'error'
@@ -23,17 +31,17 @@ type StorageTone = 'ok' | 'warn' | 'error'
 function storageIndicator(
   workspace: React.ContextType<typeof WorkspaceContext>,
 ): { label: string; tone: StorageTone } {
-  if (!workspace) return { label: 'Armazenamento local', tone: 'ok' }
-  if (workspace.stale) return { label: 'Dados desatualizados', tone: 'warn' }
+  if (!workspace) return { label: translate('Armazenamento local'), tone: 'ok' }
+  if (workspace.stale) return { label: translate('Dados desatualizados'), tone: 'warn' }
   switch (workspace.status) {
     case 'ok':
       return { label: savedLabel(workspace.savedAt), tone: 'ok' }
     case 'empty':
-      return { label: 'Workspace vazio', tone: 'ok' }
+      return { label: translate('Workspace vazio'), tone: 'ok' }
     case 'unavailable':
-      return { label: 'Sem armazenamento', tone: 'warn' }
+      return { label: translate('Sem armazenamento'), tone: 'warn' }
     default:
-      return { label: 'Dados bloqueados', tone: 'error' }
+      return { label: translate('Dados bloqueados'), tone: 'error' }
   }
 }
 
@@ -43,7 +51,8 @@ const TONE_CLASS: Record<StorageTone, string> = {
   error: 'text-destructive',
 }
 
-export function AppHeader({ title, onOpenNav, menuButtonRef }: AppHeaderProps) {
+export function AppHeader({ title, onOpenNav, menuButtonRef, onStartTour, tourButtonRef }: AppHeaderProps) {
+  const { t } = useLanguage()
   const { label, tone } = storageIndicator(useContext(WorkspaceContext))
 
   return (
@@ -54,11 +63,11 @@ export function AppHeader({ title, onOpenNav, menuButtonRef }: AppHeaderProps) {
         size="icon"
         className="-ml-2 size-11 md:hidden"
         onClick={onOpenNav}
-        aria-label="Abrir navegação"
+        aria-label={t('Abrir navegação')}
       >
         <Menu aria-hidden="true" />
       </Button>
-      <BrandMark className="size-7 md:hidden" />
+      <BrandMark className="hidden size-7 sm:block md:hidden" />
 
       <p className="flex min-w-0 items-center gap-2 text-sm">
         <span className="hidden text-muted-foreground sm:inline">Product Decision Lab</span>
@@ -77,6 +86,20 @@ export function AppHeader({ title, onOpenNav, menuButtonRef }: AppHeaderProps) {
         <HardDrive className="size-3.5" aria-hidden="true" />
         <span className="hidden sm:inline">{label}</span>
       </p>
+
+      <LanguageToggle />
+
+      <Button
+        ref={tourButtonRef}
+        variant="outline"
+        size="sm"
+        className="h-11 shrink-0 px-3 sm:h-9"
+        onClick={onStartTour}
+        aria-haspopup="dialog"
+      >
+        <CircleHelp aria-hidden="true" />
+        {t('Como funciona')}
+      </Button>
     </header>
   )
 }

@@ -1,6 +1,7 @@
 import type { DecisionStatus } from '@/types/domain'
 import type { WorkspaceState } from '@/types/workspace'
 import { nowIso } from '@/lib/dates'
+import { t } from '@/lib/i18n'
 import { decisionStatusErrors } from '@/lib/domain/decision-rules'
 import {
   migrations,
@@ -74,22 +75,31 @@ function summarize(workspace: WorkspaceState, exportedAt: string | null): Backup
 
 export function parseBackupValue(input: unknown): BackupParseResult {
   if (!isPlainObject(input)) {
-    return { ok: false, error: 'O arquivo não é um backup válido.', issues: ['Envelope inválido.'] }
+    return {
+      ok: false,
+      error: t('O arquivo não é um backup válido.'),
+      issues: [t('Envelope inválido.')],
+    }
   }
 
   const version = input.schemaVersion
   if (typeof version !== 'number' || !Number.isInteger(version) || version < 1) {
     return {
       ok: false,
-      error: 'Versão de schema ausente ou inválida.',
-      issues: ['schemaVersion deve ser um inteiro positivo.'],
+      error: t('Versão de schema ausente ou inválida.'),
+      issues: [t('schemaVersion deve ser um inteiro positivo.')],
     }
   }
   if (version > SCHEMA_VERSION) {
     return {
       ok: false,
-      error: 'Backup criado por uma versão mais nova da aplicação.',
-      issues: [`Versão ${version}, suportada até ${SCHEMA_VERSION}.`],
+      error: t('Backup criado por uma versão mais nova da aplicação.'),
+      issues: [
+        t('Versão {version}, suportada até {supported}.', {
+          version,
+          supported: SCHEMA_VERSION,
+        }),
+      ],
     }
   }
 
@@ -99,8 +109,8 @@ export function parseBackupValue(input: unknown): BackupParseResult {
     if (!migrate) {
       return {
         ok: false,
-        error: 'Não há migração disponível para este backup.',
-        issues: [`Nenhuma migração da versão ${current}.`],
+        error: t('Não há migração disponível para este backup.'),
+        issues: [t('Nenhuma migração da versão {version}.', { version: current })],
       }
     }
     data = migrate(data)
@@ -110,7 +120,7 @@ export function parseBackupValue(input: unknown): BackupParseResult {
   if (!validation.ok) {
     return {
       ok: false,
-      error: 'A estrutura do backup é inválida.',
+      error: t('A estrutura do backup é inválida.'),
       issues: validation.issues.map((issue) => `${issue.path}: ${issue.message}`),
     }
   }
@@ -118,9 +128,9 @@ export function parseBackupValue(input: unknown): BackupParseResult {
   if (hasSimulatedRecords(validation.value)) {
     return {
       ok: false,
-      error: 'O backup contém registros simulados e não foi importado.',
+      error: t('O backup contém registros simulados e não foi importado.'),
       issues: [
-        'O dataset demonstrativo não pode ser importado como dados do usuário.',
+        t('O dataset demonstrativo não pode ser importado como dados do usuário.'),
       ],
     }
   }
@@ -129,19 +139,25 @@ export function parseBackupValue(input: unknown): BackupParseResult {
   if (integrityIssues.length > 0) {
     return {
       ok: false,
-      error: 'O backup contém inconsistências e não foi importado.',
+      error: t('O backup contém inconsistências e não foi importado.'),
       issues: integrityIssues,
     }
   }
 
   // Só no backup: dados já persistidos continuam legíveis (ver docs/WFA-02-DECISION-VALIDATION-FIX.md).
   const decisionIssues = findIncompatibleDecisions(validation.value).flatMap((d) =>
-    d.pendencies.map((message) => `Decisão "${d.title}" (${d.id}, status ${d.status}): ${message}`),
+    d.pendencies.map(
+      (message) =>
+        `${t('Decisão')} "${d.title}" (${d.id}, ${t('status')} ${d.status}): ${message}`,
+    ),
   )
   if (decisionIssues.length > 0) {
     return {
       ok: false,
-      error: `O backup contém uma decisão incompatível com as regras do Workspace. Verifique os campos obrigatórios para o status informado. ${DECISION_IMPORT_GUIDANCE}`,
+      error: t(
+        'O backup contém uma decisão incompatível com as regras do Workspace. Verifique os campos obrigatórios para o status informado. {guidance}',
+        { guidance: t(DECISION_IMPORT_GUIDANCE) },
+      ),
       issues: decisionIssues,
     }
   }
@@ -164,8 +180,8 @@ export function parseBackup(text: string): BackupParseResult {
   if (bytes > MAX_BACKUP_BYTES) {
     return {
       ok: false,
-      error: 'O arquivo excede o limite de 5 MB.',
-      issues: [`Tamanho recebido: ${bytes} bytes.`],
+      error: t('O arquivo excede o limite de 5 MB.'),
+      issues: [t('Tamanho recebido: {bytes} bytes.', { bytes })],
     }
   }
 
@@ -175,8 +191,8 @@ export function parseBackup(text: string): BackupParseResult {
   } catch {
     return {
       ok: false,
-      error: 'O arquivo não contém JSON válido.',
-      issues: ['Falha ao interpretar o conteúdo.'],
+      error: t('O arquivo não contém JSON válido.'),
+      issues: [t('Falha ao interpretar o conteúdo.')],
     }
   }
 

@@ -4,6 +4,7 @@ import type { MetricSummary } from '@/lib/analytics'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useLanguage } from '@/hooks/use-language'
 import {
   METRIC_DIRECTION_LABELS,
   METRIC_UNIT_LABELS,
@@ -28,6 +29,7 @@ export function MetricCard({
   decisionCount,
   onOpen,
 }: MetricCardProps) {
+  const { t } = useLanguage()
   const { latest, previous, variation } = summary
   const DirectionIcon = variation?.direction === 'up' ? TrendingUp : variation?.direction === 'down' ? TrendingDown : Minus
   const DesiredIcon = metric.desiredDirection === 'increase' ? ArrowUpRight : ArrowDownRight
@@ -42,7 +44,7 @@ export function MetricCard({
           </Badge>
         </div>
         <p className="line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
-          {metric.description || 'Sem descrição registrada.'}
+          {metric.description || t('Sem descrição registrada.')}
         </p>
       </CardHeader>
 
@@ -52,7 +54,9 @@ export function MetricCard({
             {latest ? formatMetricValue(latest.value, metric.unit) : '—'}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            {latest ? `Último período: ${formatPeriod(latest.period)}` : 'Nenhuma observação'}
+            {latest
+              ? t('Último período: {period}', { period: formatPeriod(latest.period) })
+              : t('Nenhuma observação')}
           </p>
         </div>
 
@@ -63,7 +67,7 @@ export function MetricCard({
               <div className="flex items-center justify-between gap-2">
                 <p className="flex items-center gap-1.5 font-mono text-sm font-medium text-foreground tabular-nums">
                   <DirectionIcon className="size-4 text-muted-foreground" aria-hidden="true" />
-                  <span className="sr-only">Variação absoluta: </span>
+                  <span className="sr-only">{t('Variação absoluta: ')}</span>
                   {formatAbsoluteVariation(variation.absolute, metric.unit)}
                 </p>
                 <VariationBadge favorable={variation.favorable} />
@@ -76,22 +80,25 @@ export function MetricCard({
                     <span className="font-mono text-foreground">
                       {formatRelativeVariation(variation.relative)}
                     </span>{' '}
-                    em termos relativos
+                    {t('em termos relativos')}
                   </>
                 )}
               </p>
               <p className="text-xs leading-relaxed text-muted-foreground">
                 {variation.direction === 'flat'
-                  ? 'Sem variação em relação ao período anterior.'
-                  : `Antes: ${formatMetricValue(variation.previous.value, metric.unit)} em ${formatPeriod(variation.previous.period)}`}
+                  ? t('Sem variação em relação ao período anterior.')
+                  : t('Antes: {value} em {period}', {
+                      value: formatMetricValue(variation.previous.value, metric.unit),
+                      period: formatPeriod(variation.previous.period),
+                    })}
               </p>
             </>
           ) : (
             <>
-              <Badge variant="outline">Sem comparação</Badge>
+              <Badge variant="outline">{t('Sem comparação')}</Badge>
               <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                Histórico insuficiente para comparação.
-                {previous ? '' : ' Registre ao menos duas observações.'}
+                {t('Histórico insuficiente para comparação.')}
+                {previous ? '' : ` ${t('Registre ao menos duas observações.')}`}
               </p>
             </>
           )}
@@ -99,22 +106,27 @@ export function MetricCard({
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <DesiredIcon className="size-3.5" aria-hidden="true" />
-          Direção desejada: {METRIC_DIRECTION_LABELS[metric.desiredDirection].toLowerCase()}
+          {t('Direção desejada: {direction}', {
+            direction: METRIC_DIRECTION_LABELS[metric.desiredDirection].toLowerCase(),
+          })}
         </p>
       </CardContent>
 
       <CardFooter className="mt-4 justify-between gap-3">
         <span className="text-xs text-muted-foreground">
-          {summary.observations.length} obs. · {feedbackCount} feedbacks · {decisionCount}{' '}
-          decisões
+          {t('{observations} obs. · {feedbacks} feedbacks · {decisions} decisões', {
+            observations: summary.observations.length,
+            feedbacks: feedbackCount,
+            decisions: decisionCount,
+          })}
         </span>
         <Button
           variant="outline"
           size="sm"
           onClick={onOpen}
-          aria-label={`Abrir indicador ${metric.name}`}
+          aria-label={t('Abrir indicador {name}', { name: metric.name })}
         >
-          Abrir indicador
+          {t('Abrir indicador')}
         </Button>
       </CardFooter>
     </Card>
@@ -122,10 +134,11 @@ export function MetricCard({
 }
 
 export function VariationBadge({ favorable }: { favorable: boolean | null }) {
-  if (favorable === null) return <Badge variant="outline">Estável</Badge>
+  const { t } = useLanguage()
+  if (favorable === null) return <Badge variant="outline">{t('Estável')}</Badge>
   return favorable ? (
-    <Badge variant="success">Favorável</Badge>
+    <Badge variant="success">{t('Favorável')}</Badge>
   ) : (
-    <Badge variant="destructive">Desfavorável</Badge>
+    <Badge variant="destructive">{t('Desfavorável')}</Badge>
   )
 }

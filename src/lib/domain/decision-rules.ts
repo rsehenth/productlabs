@@ -1,4 +1,5 @@
 import type { DecisionStatus } from '@/types/domain'
+import { t } from '@/lib/i18n'
 
 /** Fonte única das exigências por status: usada pelo formulário (operations) e pela importação (backup). */
 export function decisionStatusErrors(d: {
@@ -12,13 +13,15 @@ export function decisionStatusErrors(d: {
     (d.status === 'investigating' || d.status === 'decided' || d.status === 'validated') &&
     !d.hypothesis.trim()
   ) {
-    errors.hypothesis = 'A hipótese é obrigatória neste status.'
+    errors.hypothesis = t('A hipótese é obrigatória neste status.')
   }
   if ((d.status === 'decided' || d.status === 'validated') && !d.decision.trim()) {
-    errors.decision = 'A decisão registrada é obrigatória neste status.'
+    errors.decision = t('A decisão registrada é obrigatória neste status.')
   }
   if (d.status === 'validated' && !d.successCriteria.some((item) => item.trim())) {
-    errors.successCriteria = 'Adicione ao menos um critério de sucesso para o status Validada.'
+    errors.successCriteria = t(
+      'Adicione ao menos um critério de sucesso para o status Validada.',
+    )
   }
   return errors
 }

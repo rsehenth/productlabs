@@ -7,6 +7,7 @@ import {
   type StoredWorkspace,
 } from './schema'
 import { isPlainObject, validateWorkspace, type ValidationIssue } from './validation'
+import { t } from '@/lib/i18n'
 import { collectIntegrityIssues } from '@/lib/workspace-integrity'
 
 /** Permite injetar um storage falso nos testes. */
@@ -182,7 +183,7 @@ function checkExpected(
   try {
     current = storage.getItem(STORAGE_KEY)
   } catch {
-    return { ok: false, error: 'Não foi possível ler o armazenamento local para verificar conflitos.' }
+    return { ok: false, error: t('Não foi possível ler o armazenamento local para verificar conflitos.') }
   }
   return current === expectedRaw
     ? null
@@ -196,15 +197,15 @@ export function saveWorkspace(
   expectedRaw?: string | null,
 ): WorkspaceSaveResult {
   if (!storage) {
-    return { ok: false, error: 'LocalStorage indisponível neste navegador.' }
+    return { ok: false, error: t('LocalStorage indisponível neste navegador.') }
   }
 
   const validation = validateWorkspace(workspace)
   if (!validation.ok) {
-    return { ok: false, error: 'Workspace inválido: nada foi gravado.' }
+    return { ok: false, error: t('Workspace inválido: nada foi gravado.') }
   }
   if (collectIntegrityIssues(validation.value).length > 0) {
-    return { ok: false, error: 'Workspace inconsistente: nada foi gravado.' }
+    return { ok: false, error: t('Workspace inconsistente: nada foi gravado.') }
   }
 
   const conflict = checkExpected(storage, expectedRaw)
@@ -223,7 +224,7 @@ export function saveWorkspace(
   } catch {
     return {
       ok: false,
-      error: 'Não foi possível gravar no armazenamento local (cota ou permissão).',
+      error: t('Não foi possível gravar no armazenamento local (cota ou permissão).'),
     }
   }
 }
@@ -233,7 +234,7 @@ export function clearWorkspace(
   expectedRaw?: string | null,
 ): WorkspaceSaveResult {
   if (!storage) {
-    return { ok: false, error: 'LocalStorage indisponível neste navegador.' }
+    return { ok: false, error: t('LocalStorage indisponível neste navegador.') }
   }
   const conflict = checkExpected(storage, expectedRaw)
   if (conflict) return conflict
@@ -241,6 +242,6 @@ export function clearWorkspace(
     storage.removeItem(STORAGE_KEY)
     return { ok: true, raw: null }
   } catch {
-    return { ok: false, error: 'Não foi possível limpar o armazenamento local.' }
+    return { ok: false, error: t('Não foi possível limpar o armazenamento local.') }
   }
 }

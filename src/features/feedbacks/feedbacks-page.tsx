@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Notice, type NoticeTone } from '@/components/ui/notice'
 import { PageHeader } from '@/components/ui/page-header'
 import { Select } from '@/components/ui/select'
+import { useLanguage } from '@/hooks/use-language'
 import { useWorkspace } from '@/hooks/use-workspace'
 import { CONFLICT_MESSAGE } from '@/lib/storage/workspace-storage'
 import { formatDate } from '@/lib/dates'
@@ -31,6 +32,7 @@ type FormState = { mode: 'create' } | { mode: 'edit'; feedback: UserFeedback } |
 type PageNotice = { tone: NoticeTone; message: string } | null
 
 export function FeedbacksPage() {
+  const { t } = useLanguage()
   const { workspace, deleteFeedback } = useWorkspace()
   const [filters, setFilters] = useState<FeedbackFilters>(EMPTY_FEEDBACK_FILTERS)
   const [form, setForm] = useState<FormState>(null)
@@ -68,19 +70,21 @@ export function FeedbacksPage() {
       return
     }
     setDeleteTarget(null)
-    setNotice({ tone: 'success', message: 'Feedback excluído.' })
+    setNotice({ tone: 'success', message: t('Feedback excluído.') })
   }
 
   return (
     <>
       <PageHeader
         title="Feedback Discovery"
-        description="Organize a voz dos usuários e conecte informações qualitativas aos problemas identificados nas métricas."
-        badge={<Badge variant="outline">MVP funcional</Badge>}
+        description={t(
+          'Organize a voz dos usuários e conecte informações qualitativas aos problemas identificados nas métricas.',
+        )}
+        badge={<Badge variant="outline">{t('MVP funcional')}</Badge>}
         actions={
-          <Button onClick={() => setForm({ mode: 'create' })}>
+          <Button data-tour-id="feedback-new" onClick={() => setForm({ mode: 'create' })}>
             <Plus aria-hidden="true" />
-            Novo feedback
+            {t('Novo feedback')}
           </Button>
         }
       />
@@ -91,10 +95,9 @@ export function FeedbacksPage() {
         </Notice>
       ) : null}
 
-      <section aria-label="Resumo de feedbacks" className="space-y-1.5">
+      <section aria-label={t('Resumo de feedbacks')} className="space-y-1.5">
         <p className="text-sm text-muted-foreground">
-          <span className="font-mono text-foreground">{workspace.feedbacks.length}</span>{' '}
-          feedback(s) no workspace.
+          {t('{count} feedback(s) no workspace.', { count: workspace.feedbacks.length })}
         </p>
         {workspace.feedbacks.length > 0 ? (
           <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
@@ -114,24 +117,27 @@ export function FeedbacksPage() {
       {workspace.feedbacks.length === 0 ? (
         <EmptyState
           icon={MessageSquareQuote}
-          title="Nenhum feedback no workspace"
-          description="Registre relatos de entrevistas, tickets, pesquisas e avaliações para conectá-los aos indicadores e às decisões."
+          title={t('Nenhum feedback no workspace')}
+          description={t(
+            'Registre relatos de entrevistas, tickets, pesquisas e avaliações para conectá-los aos indicadores e às decisões.',
+          )}
         >
           <Button onClick={() => setForm({ mode: 'create' })}>
             <Plus aria-hidden="true" />
-            Criar feedback
+            {t('Criar feedback')}
           </Button>
         </EmptyState>
       ) : (
         <>
           <section
-            aria-label="Pesquisa e filtros"
+            data-tour-id="feedback-filters"
+            aria-label={t('Pesquisa e filtros')}
             className="space-y-3 rounded-xl border border-border/70 bg-card/60 p-3 sm:p-4"
           >
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="sm:col-span-3">
                 <label htmlFor="feedback-search" className="sr-only">
-                  Pesquisar feedbacks
+                  {t('Pesquisar feedbacks')}
                 </label>
                 <div className="relative">
                   <Search
@@ -141,7 +147,7 @@ export function FeedbacksPage() {
                   <Input
                     id="feedback-search"
                     className="pl-9"
-                    placeholder="Pesquisar por conteúdo, categoria ou fonte"
+                    placeholder={t('Pesquisar por conteúdo, categoria ou fonte')}
                     value={filters.search}
                     onChange={(event) => updateFilter('search', event.target.value)}
                   />
@@ -150,7 +156,7 @@ export function FeedbacksPage() {
 
               <div>
                 <label htmlFor="feedback-filter-category" className="sr-only">
-                  Filtrar por categoria
+                  {t('Filtrar por categoria')}
                 </label>
                 <Select
                   id="feedback-filter-category"
@@ -159,7 +165,7 @@ export function FeedbacksPage() {
                     updateFilter('category', event.target.value as FeedbackCategory | 'all')
                   }
                 >
-                  <option value="all">Todas as categorias</option>
+                  <option value="all">{t('Todas as categorias')}</option>
                   {Object.entries(FEEDBACK_CATEGORY_LABELS).map(([value, label]) => (
                     <option key={value} value={value}>
                       {label}
@@ -170,7 +176,7 @@ export function FeedbacksPage() {
 
               <div>
                 <label htmlFor="feedback-filter-source" className="sr-only">
-                  Filtrar por fonte
+                  {t('Filtrar por fonte')}
                 </label>
                 <Select
                   id="feedback-filter-source"
@@ -179,7 +185,7 @@ export function FeedbacksPage() {
                     updateFilter('source', event.target.value as FeedbackSource | 'all')
                   }
                 >
-                  <option value="all">Todas as fontes</option>
+                  <option value="all">{t('Todas as fontes')}</option>
                   {Object.entries(FEEDBACK_SOURCE_LABELS).map(([value, label]) => (
                     <option key={value} value={value}>
                       {label}
@@ -190,14 +196,14 @@ export function FeedbacksPage() {
 
               <div>
                 <label htmlFor="feedback-filter-metric" className="sr-only">
-                  Filtrar por indicador
+                  {t('Filtrar por indicador')}
                 </label>
                 <Select
                   id="feedback-filter-metric"
                   value={filters.metricId}
                   onChange={(event) => updateFilter('metricId', event.target.value)}
                 >
-                  <option value="all">Todos os indicadores</option>
+                  <option value="all">{t('Todos os indicadores')}</option>
                   {workspace.metrics.map((metric) => (
                     <option key={metric.id} value={metric.id}>
                       {metric.name}
@@ -214,7 +220,7 @@ export function FeedbacksPage() {
                 onClick={() => setFilters(EMPTY_FEEDBACK_FILTERS)}
               >
                 <X aria-hidden="true" />
-                Limpar filtros
+                {t('Limpar filtros')}
               </Button>
             ) : null}
           </section>
@@ -222,18 +228,23 @@ export function FeedbacksPage() {
           {filtered.length === 0 ? (
             <EmptyState
               icon={Search}
-              title="Nenhum feedback encontrado"
-              description="Nenhum registro corresponde à busca e aos filtros atuais. Ajuste os critérios para ver mais resultados."
+              title={t('Nenhum feedback encontrado')}
+              description={t(
+                'Nenhum registro corresponde à busca e aos filtros atuais. Ajuste os critérios para ver mais resultados.',
+              )}
             >
               <Button variant="outline" onClick={() => setFilters(EMPTY_FEEDBACK_FILTERS)}>
-                Limpar busca e filtros
+                {t('Limpar busca e filtros')}
               </Button>
             </EmptyState>
           ) : (
-            <section aria-label="Lista de feedbacks" className="space-y-3">
-              <h2 className="sr-only">Lista de feedbacks</h2>
+            <section aria-label={t('Lista de feedbacks')} className="space-y-3">
+              <h2 className="sr-only">{t('Lista de feedbacks')}</h2>
               <p className="font-mono text-xs text-muted-foreground">
-                Exibindo {filtered.length} de {workspace.feedbacks.length} feedback(s).
+                {t('Exibindo {shown} de {total} feedback(s).', {
+                  shown: filtered.length,
+                  total: workspace.feedbacks.length,
+                })}
               </p>
               <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
                 {filtered.map((feedback) => {
@@ -243,7 +254,10 @@ export function FeedbacksPage() {
                   const decisions = workspace.decisions.filter((decision) =>
                     decision.feedbackIds.includes(feedback.id),
                   )
-                  const label = `${FEEDBACK_CATEGORY_LABELS[feedback.category]} de ${formatDate(feedback.receivedAt)}`
+                  const label = t('{category} de {date}', {
+                    category: FEEDBACK_CATEGORY_LABELS[feedback.category],
+                    date: formatDate(feedback.receivedAt),
+                  })
 
                   return (
                     <li key={feedback.id}>
@@ -254,7 +268,7 @@ export function FeedbacksPage() {
                             {FEEDBACK_CATEGORY_LABELS[feedback.category]}
                           </p>
                           <p>
-                            <span className="sr-only">Fonte: </span>
+                            <span className="sr-only">{t('Fonte: ')}</span>
                             {FEEDBACK_SOURCE_LABELS[feedback.source]}
                           </p>
                         </div>
@@ -267,10 +281,12 @@ export function FeedbacksPage() {
                           <div className="space-y-1.5 text-xs">
                             <p className="text-muted-foreground">
                               {metrics.length === 0
-                                ? 'Sem indicador associado.'
+                                ? t('Sem indicador associado.')
                                 : metrics.length === 1
-                                  ? 'Associado a 1 indicador:'
-                                  : `Associado a ${metrics.length} indicadores:`}
+                                  ? t('Associado a 1 indicador:')
+                                  : t('Associado a {count} indicadores:', {
+                                      count: metrics.length,
+                                    })}
                             </p>
                             {metrics.length > 0 ? (
                               <ul className="flex flex-wrap gap-1.5">
@@ -293,7 +309,7 @@ export function FeedbacksPage() {
 
                           {decisions.length > 0 ? (
                             <div className="space-y-1 text-xs">
-                              <p className="text-muted-foreground">Citado como evidência em:</p>
+                              <p className="text-muted-foreground">{t('Citado como evidência em:')}</p>
                               <ul className="space-y-1">
                                 {decisions.map((decision) => (
                                   <li key={decision.id} className="break-words">
@@ -318,19 +334,19 @@ export function FeedbacksPage() {
                               variant="outline"
                               size="sm"
                               className="max-sm:min-h-11"
-                              aria-label={`Editar feedback: ${label}`}
+                              aria-label={t('Editar feedback: {label}', { label })}
                               onClick={() => setForm({ mode: 'edit', feedback })}
                             >
-                              Editar
+                              {t('Editar')}
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               className="max-sm:min-h-11"
-                              aria-label={`Excluir feedback: ${label}`}
+                              aria-label={t('Excluir feedback: {label}', { label })}
                               onClick={() => setDeleteTarget(feedback)}
                             >
-                              Excluir
+                              {t('Excluir')}
                             </Button>
                           </div>
                         </div>
@@ -352,7 +368,8 @@ export function FeedbacksPage() {
             setForm(null)
             setNotice({
               tone: 'success',
-              message: form.mode === 'edit' ? 'Feedback atualizado.' : 'Feedback criado.',
+              message:
+                form.mode === 'edit' ? t('Feedback atualizado.') : t('Feedback criado.'),
             })
           }}
         />
@@ -364,13 +381,15 @@ export function FeedbacksPage() {
           onOpenChange={(open) => {
             if (!open) setDeleteTarget(null)
           }}
-          title="Excluir feedback"
+          title={t('Excluir feedback')}
           description={
             deleteDecisions.length > 0
-              ? 'Este feedback é evidência de decisões registradas e não pode ser excluído diretamente.'
-              : 'Esta ação remove o feedback do workspace e não pode ser desfeita.'
+              ? t(
+                  'Este feedback é evidência de decisões registradas e não pode ser excluído diretamente.',
+                )
+              : t('Esta ação remove o feedback do workspace e não pode ser desfeita.')
           }
-          confirmLabel="Excluir feedback"
+          confirmLabel={t('Excluir feedback')}
           onConfirm={handleDelete}
           blocked={deleteDecisions.length > 0}
           pending={deleting}
@@ -382,8 +401,12 @@ export function FeedbacksPage() {
             }”`,
             ...(deleteDecisions.length > 0
               ? [
-                  ...deleteDecisions.map((decision) => `Decisão: ${decision.title}`),
-                  'Abra a decisão, remova este feedback das evidências e tente novamente.',
+                  ...deleteDecisions.map((decision) =>
+                    t('Decisão: {title}', { title: decision.title }),
+                  ),
+                  t(
+                    'Abra a decisão, remova este feedback das evidências e tente novamente.',
+                  ),
                 ]
               : []),
           ]}

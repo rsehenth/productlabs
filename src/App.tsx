@@ -1,10 +1,20 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { AppShell } from '@/components/layout/app-shell'
-import { DecisionsPage } from '@/features/decisions/decisions-page'
-import { FeedbacksPage } from '@/features/feedbacks/feedbacks-page'
-import { InteractiveCasePage } from '@/features/interactive-case/interactive-case-page'
-import { OverviewPage } from '@/features/overview/overview-page'
+import { useLanguage } from '@/hooks/use-language'
 import { useRoute, type RouteId } from '@/lib/routing'
+
+const DecisionsPage = lazy(() =>
+  import('@/features/decisions/decisions-page').then((module) => ({ default: module.DecisionsPage })),
+)
+const FeedbacksPage = lazy(() =>
+  import('@/features/feedbacks/feedbacks-page').then((module) => ({ default: module.FeedbacksPage })),
+)
+const InteractiveCasePage = lazy(() =>
+  import('@/features/interactive-case/interactive-case-page').then((module) => ({ default: module.InteractiveCasePage })),
+)
+const OverviewPage = lazy(() =>
+  import('@/features/overview/overview-page').then((module) => ({ default: module.OverviewPage })),
+)
 
 function RouteView({ route }: { route: RouteId }) {
   switch (route) {
@@ -20,6 +30,7 @@ function RouteView({ route }: { route: RouteId }) {
 }
 
 export default function App() {
+  const { t } = useLanguage()
   const { route } = useRoute()
 
   useEffect(() => {
@@ -28,7 +39,9 @@ export default function App() {
 
   return (
     <AppShell route={route}>
-      <RouteView route={route} />
+      <Suspense fallback={<p role="status" className="text-sm text-muted-foreground">{t('Carregando página…')}</p>}>
+        <RouteView route={route} />
+      </Suspense>
     </AppShell>
   )
 }

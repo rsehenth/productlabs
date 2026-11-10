@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Label } from '@/components/ui/label'
+import { useLanguage } from '@/hooks/use-language'
 
 interface FieldProps {
   id: string
@@ -11,6 +12,7 @@ interface FieldProps {
 }
 
 export function Field({ id, label, required, hint, error, children }: FieldProps) {
+  const { t } = useLanguage()
   return (
     <div className="space-y-1.5">
       <div className="flex items-baseline justify-between gap-2">
@@ -24,7 +26,7 @@ export function Field({ id, label, required, hint, error, children }: FieldProps
         </Label>
         {required ? (
           <span className="text-xs text-muted-foreground">
-            Obrigatório
+            {t('Obrigatório')}
           </span>
         ) : null}
       </div>

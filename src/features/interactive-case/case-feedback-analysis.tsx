@@ -1,5 +1,6 @@
 import { Notice } from '@/components/ui/notice'
 import { Select } from '@/components/ui/select'
+import { useLanguage } from '@/hooks/use-language'
 import { CaseFeedbackCard } from '@/features/interactive-case/case-feedback-card'
 import {
   filterCaseFeedbackViews,
@@ -30,6 +31,7 @@ export function CaseFeedbackAnalysis({
   selectedIds,
   onToggleEvidence,
 }: CaseFeedbackAnalysisProps) {
+  const { t } = useLanguage()
   const visible = filterCaseFeedbackViews(views, filter, selectedMetricId)
   const selectedSet = new Set(selectedIds)
 
@@ -37,22 +39,23 @@ export function CaseFeedbackAnalysis({
     <section aria-labelledby="case-feedback-title" className="space-y-4">
       <div>
         <h2 id="case-feedback-title" className="text-lg font-semibold text-foreground">
-          02 — Analisar a voz dos usuários
+          {t('02 — Analisar a voz dos usuários')}
         </h2>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Explore os feedbacks disponíveis e identifique quais relatos podem ajudar a formular
-          hipóteses sobre o problema.
+          {t(
+            'Explore os feedbacks disponíveis e identifique quais relatos podem ajudar a formular hipóteses sobre o problema.',
+          )}
         </p>
       </div>
 
-      <Notice tone="info">{SIMULATION_NOTICE}</Notice>
+      <Notice tone="info">{t(SIMULATION_NOTICE)}</Notice>
 
       <div className="flex flex-wrap items-center gap-3">
         <label
           htmlFor="case-feedback-filter"
           className="text-xs font-medium text-foreground"
         >
-          Visualizar
+          {t('Visualizar')}
         </label>
         <Select
           id="case-feedback-filter"
@@ -60,18 +63,22 @@ export function CaseFeedbackAnalysis({
           value={filter}
           onChange={(event) => onFilterChange(event.target.value as CaseFeedbackFilter)}
         >
-          <option value="all">Todos os feedbacks</option>
-          <option value="related">Relacionados ao indicador selecionado</option>
+          <option value="all">{t('Todos os feedbacks')}</option>
+          <option value="related">{t('Relacionados ao indicador selecionado')}</option>
         </Select>
         <p className="text-xs text-muted-foreground">
-          Exibindo {visible.length} de {views.length} feedback(s).
+          {t('Exibindo {shown} de {total} feedback(s).', {
+            shown: visible.length,
+            total: views.length,
+          })}
         </p>
       </div>
 
       {visible.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          Nenhum feedback relacionado ao indicador selecionado. Altere o filtro para visualizar
-          todos os relatos.
+          {t(
+            'Nenhum feedback relacionado ao indicador selecionado. Altere o filtro para visualizar todos os relatos.',
+          )}
         </p>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
@@ -88,10 +95,11 @@ export function CaseFeedbackAnalysis({
       )}
 
       <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
-        <p>{INTERPRETATION_NOTICE}</p>
+        <p>{t(INTERPRETATION_NOTICE)}</p>
         <p className="text-muted-foreground/80">
-          Observação: a variação registrada em um indicador. Evidência qualitativa: o relato de um
-          usuário. Hipótese: uma explicação possível, ainda não verificada.
+          {t(
+            'Observação: a variação registrada em um indicador. Evidência qualitativa: o relato de um usuário. Hipótese: uma explicação possível, ainda não verificada.',
+          )}
         </p>
       </div>
     </section>

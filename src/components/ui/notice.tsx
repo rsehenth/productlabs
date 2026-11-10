@@ -1,6 +1,7 @@
 import { CircleCheck, CircleAlert, Info, TriangleAlert, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/hooks/use-language'
 import { cn } from '@/lib/utils'
 
 export type NoticeTone = 'success' | 'error' | 'info' | 'warning'
@@ -32,6 +33,7 @@ const TONES = {
 } as const
 
 export function Notice({ tone, children, onDismiss, tabIndex }: NoticeProps) {
+  const { t } = useLanguage()
   const { icon: Icon, className } = TONES[tone]
   return (
     <div
@@ -42,7 +44,7 @@ export function Notice({ tone, children, onDismiss, tabIndex }: NoticeProps) {
       <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
       <div className="min-w-0 flex-1 space-y-1 text-sm leading-relaxed">{children}</div>
       {onDismiss ? (
-        <Button variant="ghost" size="icon" aria-label="Dispensar aviso" onClick={onDismiss}>
+        <Button variant="ghost" size="icon" aria-label={t('Dispensar aviso')} onClick={onDismiss}>
           <X aria-hidden="true" />
         </Button>
       ) : null}

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
+import { useLanguage } from '@/hooks/use-language'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -24,6 +25,7 @@ export function ConfirmDialog({
   blocked = false,
   pending = false,
 }: ConfirmDialogProps) {
+  const { t } = useLanguage()
   return (
     <Dialog
       open={open}
@@ -35,15 +37,15 @@ export function ConfirmDialog({
       footer={
         blocked ? (
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Fechar
+            {t('Fechar')}
           </Button>
         ) : (
           <>
             <Button variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
-              Cancelar
+              {t('Cancelar')}
             </Button>
             <Button variant="destructive" onClick={onConfirm} disabled={pending}>
-              {pending ? 'Excluindo…' : confirmLabel}
+              {pending ? t('Excluindo…') : confirmLabel}
             </Button>
           </>
         )

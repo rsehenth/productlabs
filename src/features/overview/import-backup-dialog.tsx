@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Field } from '@/components/ui/field'
 import { Notice } from '@/components/ui/notice'
+import { useLanguage } from '@/hooks/use-language'
 import { useWorkspace } from '@/hooks/use-workspace'
 import type { BackupSummary } from '@/lib/backup'
 import { createBackupSelection } from '@/lib/backup-selection'
@@ -15,6 +16,7 @@ interface ImportBackupDialogProps {
 }
 
 export function ImportBackupDialog({ onClose, onImported }: ImportBackupDialogProps) {
+  const { t } = useLanguage()
   const { workspace, replaceWorkspace } = useWorkspace()
   const [selection] = useState(() => createBackupSelection(replaceWorkspace))
   const { phase, fileName, summary, error, issues } = useSyncExternalStore(
@@ -49,19 +51,21 @@ export function ImportBackupDialog({ onClose, onImported }: ImportBackupDialogPr
       onOpenChange={(open) => {
         if (!open && !busy) onClose()
       }}
-      title="Importar backup"
-      description="Selecione um arquivo JSON exportado pelo Product Decision Lab. A importação substitui todo o workspace deste navegador."
+      title={t('Importar backup')}
+      description={t(
+        'Selecione um arquivo JSON exportado pelo Product Decision Lab. A importação substitui todo o workspace deste navegador.',
+      )}
       footer={
         <>
           <Button variant="outline" onClick={onClose} disabled={busy}>
-            Cancelar
+            {t('Cancelar')}
           </Button>
           <Button
             variant="destructive"
             onClick={handleConfirm}
             disabled={phase !== 'ready' && phase !== 'failed'}
           >
-            {phase === 'importing' ? 'Importando…' : 'Substituir workspace'}
+            {phase === 'importing' ? t('Importando…') : t('Substituir workspace')}
           </Button>
         </>
       }
@@ -82,9 +86,9 @@ export function ImportBackupDialog({ onClose, onImported }: ImportBackupDialogPr
 
         <Field
           id="backup-file"
-          label="Arquivo de backup (JSON)"
+          label={t('Arquivo de backup (JSON)')}
           required
-          hint="Até 5 MB. O conteúdo é validado antes de qualquer substituição."
+          hint={t('Até 5 MB. O conteúdo é validado antes de qualquer substituição.')}
         >
           <input
             id="backup-file"
@@ -97,38 +101,40 @@ export function ImportBackupDialog({ onClose, onImported }: ImportBackupDialogPr
         </Field>
 
         {phase === 'reading' ? (
-          <p className="text-xs text-muted-foreground" role="status">Lendo {fileName}…</p>
+          <p className="text-xs text-muted-foreground" role="status">{t('Lendo {file}…', { file: fileName ?? '' })}</p>
         ) : fileName ? (
-          <p className="text-xs text-muted-foreground">Arquivo selecionado: {fileName}</p>
+          <p className="text-xs text-muted-foreground">{t('Arquivo selecionado: {file}', { file: fileName })}</p>
         ) : null}
 
         {summary ? (
           <div className="space-y-2 rounded-lg border border-border/70 bg-background/40 p-4">
-            <p className="text-sm font-medium text-foreground">Resumo do backup</p>
+            <p className="text-sm font-medium text-foreground">{t('Resumo do backup')}</p>
             <ul className="grid gap-1 text-sm text-muted-foreground sm:grid-cols-2">
-              <li>{summary.metrics} indicadores</li>
-              <li>{summary.observations} observações</li>
-              <li>{summary.feedbacks} feedbacks</li>
-              <li>{summary.decisions} decisões</li>
+              <li>{t('{count} indicadores', { count: summary.metrics })}</li>
+              <li>{t('{count} observações', { count: summary.observations })}</li>
+              <li>{t('{count} feedbacks', { count: summary.feedbacks })}</li>
+              <li>{t('{count} decisões', { count: summary.decisions })}</li>
             </ul>
             <p className="text-xs text-muted-foreground">
-              Data do backup:{' '}
-              {summary.exportedAt
-                ? formatDateTime(summary.exportedAt)
-                : 'não informada'}
+              {t('Data do backup: {date}', {
+                date: summary.exportedAt
+                  ? formatDateTime(summary.exportedAt)
+                  : t('não informada'),
+              })}
             </p>
           </div>
         ) : null}
 
         <Notice tone="info">
-          A importação substituirá os dados atuais deste navegador. Não há mesclagem de
-          backups nesta etapa.
+          {t(
+            'A importação substituirá os dados atuais deste navegador. Não há mesclagem de backups nesta etapa.',
+          )}
         </Notice>
 
         {hasCurrentData ? (
           <fieldset disabled={busy}>
             <ExportBackupButton
-              label="Exportar dados atuais antes de importar"
+              label={t('Exportar dados atuais antes de importar')}
               onReview={onClose}
               onExported={(message) => setExportNote(message)}
             />

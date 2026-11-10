@@ -8,11 +8,13 @@ import {
   YAxis,
 } from 'recharts'
 import { demoChartSeries, findDemoMetric, formatDemoValue } from '@/data/demo/demo-dataset'
+import { useLanguage } from '@/hooks/use-language'
 import { formatPeriod, formatPeriodShort } from '@/lib/domain-labels'
 
 const METRIC_ID = 'demo-metric-activation'
 
 export function DemoActivationChart() {
+  const { t } = useLanguage()
   const metric = findDemoMetric(METRIC_ID)
   const series = demoChartSeries(METRIC_ID)
   const values = series.map((point) => point.value)
@@ -29,8 +31,8 @@ export function DemoActivationChart() {
   return (
     <div className="rounded-lg border border-border/70 bg-background/40 p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="text-xs font-medium text-foreground">{metric.name}</p>
-        <span className="text-[11px] text-muted-foreground">% das contas novas</span>
+        <p className="text-xs font-medium text-foreground">{t(metric.name)}</p>
+        <span className="text-[11px] text-muted-foreground">{t('% das contas novas')}</span>
       </div>
 
       <div className="mt-3 h-40 w-full" aria-hidden="true">
@@ -67,7 +69,7 @@ export function DemoActivationChart() {
               labelFormatter={(label) => formatPeriod(String(label))}
               formatter={(value) => [
                 typeof value === 'number' ? formatDemoValue(METRIC_ID, value) : String(value),
-                metric.name,
+                t(metric.name),
               ]}
             />
             <Line
@@ -84,9 +86,12 @@ export function DemoActivationChart() {
 
       {first !== undefined && last !== undefined ? (
         <p className="mt-2 text-xs text-muted-foreground">
-          Série simulada: {formatDemoValue(METRIC_ID, first)} em{' '}
-          {formatPeriod(series[0]?.period ?? '')} e {formatDemoValue(METRIC_ID, last)} em{' '}
-          {formatPeriod(series[series.length - 1]?.period ?? '')}.
+          {t('Série simulada: {first} em {from} e {last} em {to}.', {
+            first: formatDemoValue(METRIC_ID, first),
+            from: formatPeriod(series[0]?.period ?? ''),
+            last: formatDemoValue(METRIC_ID, last),
+            to: formatPeriod(series[series.length - 1]?.period ?? ''),
+          })}
         </p>
       ) : null}
     </div>

@@ -2,6 +2,7 @@ import type { DecisionRecord } from '@/types/domain'
 import type { WorkspaceState } from '@/types/workspace'
 import { metricSummary } from '@/lib/analytics'
 import { formatDate, formatDateTime, formatPeriodLong } from '@/lib/dates'
+import { t } from '@/lib/i18n'
 import {
   DECISION_STATUS_LABELS,
   FEEDBACK_CATEGORY_LABELS,
@@ -36,7 +37,7 @@ export function buildDecisionMarkdown(
 
   const metricLines =
     metrics.length === 0
-      ? 'Nenhum indicador relacionado.'
+      ? t('Nenhum indicador relacionado.')
       : metrics
           .map((metric) => {
             const summary = metricSummary(workspace, metric)
@@ -44,9 +45,15 @@ export function buildDecisionMarkdown(
             return [
               `- **${metric.name}**`,
               latest
-                ? `  - Último valor: ${formatMetricValue(latest.value, metric.unit)}`
-                : '  - Sem observações registradas.',
-              latest ? `  - Período: ${formatPeriodLong(latest.period)}` : null,
+                ? `  - ${t('Último valor: {value}', {
+                    value: formatMetricValue(latest.value, metric.unit),
+                  })}`
+                : `  - ${t('Sem observações registradas.')}`,
+              latest
+                ? `  - ${t('Período: {period}', {
+                    period: formatPeriodLong(latest.period),
+                  })}`
+                : null,
             ]
               .filter(Boolean)
               .join('\n')
@@ -55,16 +62,16 @@ export function buildDecisionMarkdown(
 
   const feedbackLines =
     feedbacks.length === 0
-      ? 'Nenhum feedback relacionado.'
+      ? t('Nenhum feedback relacionado.')
       : feedbacks
           .map((feedback, index) => {
             const content = feedback.content.split('\n').join('\n    ')
             return [
-              `- **Feedback ${index + 1}**`,
-              `  - Categoria: ${FEEDBACK_CATEGORY_LABELS[feedback.category]}`,
-              `  - Fonte: ${FEEDBACK_SOURCE_LABELS[feedback.source]}`,
-              `  - Data: ${formatDate(feedback.receivedAt)}`,
-              `  - Conteúdo: ${content}`,
+              `- **${t('Feedback {index}', { index: index + 1 })}**`,
+              `  - ${t('Categoria: {label}', { label: FEEDBACK_CATEGORY_LABELS[feedback.category] })}`,
+              `  - ${t('Fonte: {label}', { label: FEEDBACK_SOURCE_LABELS[feedback.source] })}`,
+              `  - ${t('Data: {date}', { date: formatDate(feedback.receivedAt) })}`,
+              `  - ${t('Conteúdo: {content}', { content })}`,
             ].join('\n')
           })
           .join('\n')
@@ -72,43 +79,45 @@ export function buildDecisionMarkdown(
   return [
     '# Product Decision Record',
     '',
-    '## Título',
+    `## ${t('Título')}`,
     decision.title,
     '',
-    '## Status',
+    `## ${t('Status')}`,
     DECISION_STATUS_LABELS[decision.status],
     '',
-    '## Problema',
+    `## ${t('Problema')}`,
     decision.problem,
     '',
-    '## Indicadores relacionados',
+    `## ${t('Indicadores relacionados')}`,
     metricLines,
     '',
-    '## Feedbacks relacionados',
+    `## ${t('Feedbacks relacionados')}`,
     feedbackLines,
     '',
-    '## Hipótese',
-    decision.hypothesis || 'Não registrada.',
+    `## ${t('Hipótese')}`,
+    decision.hypothesis || t('Não registrada.'),
     '',
-    '## Alternativas consideradas',
-    numbered(decision.alternatives, 'Nenhuma alternativa registrada.'),
+    `## ${t('Alternativas consideradas')}`,
+    numbered(decision.alternatives, t('Nenhuma alternativa registrada.')),
     '',
-    '## Decisão',
-    decision.decision || 'Não registrada.',
+    `## ${t('Decisão')}`,
+    decision.decision || t('Não registrada.'),
     '',
-    '## Critérios de sucesso',
-    bullets(decision.successCriteria, 'Nenhum critério registrado.'),
+    `## ${t('Critérios de sucesso')}`,
+    bullets(decision.successCriteria, t('Nenhum critério registrado.')),
     '',
-    '## Próximos passos',
-    bullets(decision.nextSteps, 'Nenhum próximo passo registrado.'),
+    `## ${t('Próximos passos')}`,
+    bullets(decision.nextSteps, t('Nenhum próximo passo registrado.')),
     '',
-    '## Metadados',
-    `Criado em: ${formatDateTime(decision.createdAt)}`,
-    `Atualizado em: ${formatDateTime(decision.updatedAt)}`,
+    `## ${t('Metadados')}`,
+    t('Criado em: {date}', { date: formatDateTime(decision.createdAt) }),
+    t('Atualizado em: {date}', { date: formatDateTime(decision.updatedAt) }),
     '',
     '---',
-    'Gerado pelo Product Decision Lab.',
-    'Este documento registra uma decisão de produto e suas evidências. Uma hipótese registrada não é um resultado validado automaticamente.',
+    t('Gerado pelo Product Decision Lab.'),
+    t(
+      'Este documento registra uma decisão de produto e suas evidências. Uma hipótese registrada não é um resultado validado automaticamente.',
+    ),
     '',
   ].join('\n')
 }

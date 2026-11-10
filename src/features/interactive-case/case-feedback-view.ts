@@ -1,5 +1,6 @@
 import type { CaseFeedback, CaseMetric } from '@/types/interactive-case'
 import type { FeedbackCategory, FeedbackSource } from '@/types/domain'
+import { t } from '@/lib/i18n'
 
 /**
  * Regras puras de leitura, filtragem e seleção de feedbacks do Interactive Case.
@@ -118,5 +119,7 @@ export function caseEvidenceCategories(
 }
 
 export function caseEvidenceCountLabel(count: number): string {
-  return `${count} ${count === 1 ? 'evidência selecionada' : 'evidências selecionadas'}`
+  return t(count === 1 ? '{count} evidência selecionada' : '{count} evidências selecionadas', {
+    count,
+  })
 }

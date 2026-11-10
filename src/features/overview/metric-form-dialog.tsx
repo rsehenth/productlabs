@@ -8,6 +8,7 @@ import { Notice } from '@/components/ui/notice'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useFormErrors } from '@/hooks/use-form-errors'
+import { useLanguage } from '@/hooks/use-language'
 import { useWorkspace } from '@/hooks/use-workspace'
 import {
   FIELD_LIMITS,
@@ -22,6 +23,7 @@ interface MetricFormDialogProps {
 }
 
 export function MetricFormDialog({ metric, onClose, onSaved }: MetricFormDialogProps) {
+  const { t } = useLanguage()
   const { createMetric, updateMetric } = useWorkspace()
   const [name, setName] = useState(metric?.name ?? '')
   const [description, setDescription] = useState(metric?.description ?? '')
@@ -62,15 +64,21 @@ export function MetricFormDialog({ metric, onClose, onSaved }: MetricFormDialogP
       onOpenChange={(open) => {
         if (!open && !saving) onClose()
       }}
-      title={metric ? 'Editar indicador' : 'Novo indicador'}
-      description="Indicadores representam medidas do produto. A direção desejada é uma configuração sua, não uma inferência automática."
+      title={metric ? t('Editar indicador') : t('Novo indicador')}
+      description={t(
+        'Indicadores representam medidas do produto. A direção desejada é uma configuração sua, não uma inferência automática.',
+      )}
       footer={
         <>
           <Button variant="outline" onClick={onClose} disabled={saving}>
-            Cancelar
+            {t('Cancelar')}
           </Button>
           <Button type="submit" form="metric-form" disabled={saving}>
-            {saving ? 'Salvando…' : metric ? 'Salvar alterações' : 'Criar indicador'}
+            {saving
+              ? t('Salvando…')
+              : metric
+                ? t('Salvar alterações')
+                : t('Criar indicador')}
           </Button>
         </>
       }
@@ -80,10 +88,12 @@ export function MetricFormDialog({ metric, onClose, onSaved }: MetricFormDialogP
 
         <Field
           id="metric-name"
-          label="Nome do indicador"
+          label={t('Nome do indicador')}
           required
           error={fieldErrors.name}
-          hint={`Ex.: Conversão Free → Premium. Até ${FIELD_LIMITS.metricName} caracteres.`}
+          hint={t('Ex.: Conversão Free → Premium. Até {max} caracteres.', {
+            max: FIELD_LIMITS.metricName,
+          })}
         >
           <Input
             id="metric-name"
@@ -95,7 +105,7 @@ export function MetricFormDialog({ metric, onClose, onSaved }: MetricFormDialogP
             }}
             aria-invalid={Boolean(fieldErrors.name)}
             aria-describedby={fieldAria('metric-name', {
-              hint: `Até ${FIELD_LIMITS.metricName} caracteres.`,
+              hint: t('Até {max} caracteres.', { max: FIELD_LIMITS.metricName }),
               error: fieldErrors.name,
             })}
             autoFocus
@@ -104,9 +114,9 @@ export function MetricFormDialog({ metric, onClose, onSaved }: MetricFormDialogP
 
         <Field
           id="metric-description"
-          label="Descrição"
+          label={t('Descrição')}
           error={fieldErrors.description}
-          hint="Opcional. Explique o que o indicador mede."
+          hint={t('Opcional. Explique o que o indicador mede.')}
         >
           <Textarea
             id="metric-description"
@@ -120,14 +130,14 @@ export function MetricFormDialog({ metric, onClose, onSaved }: MetricFormDialogP
             }}
             aria-invalid={Boolean(fieldErrors.description)}
             aria-describedby={fieldAria('metric-description', {
-              hint: 'Opcional. Explique o que o indicador mede.',
+              hint: t('Opcional. Explique o que o indicador mede.'),
               error: fieldErrors.description,
             })}
           />
         </Field>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field id="metric-unit" label="Unidade" required error={fieldErrors.unit}>
+          <Field id="metric-unit" label={t('Unidade')} required error={fieldErrors.unit}>
             <Select
               id="metric-unit"
               value={unit}
@@ -148,13 +158,13 @@ export function MetricFormDialog({ metric, onClose, onSaved }: MetricFormDialogP
 
           <Field
             id="metric-direction"
-            label="Direção desejada"
+            label={t('Direção desejada')}
             required
             error={fieldErrors.desiredDirection}
             hint={
               direction === 'increase'
-                ? 'Valores maiores contam como favoráveis.'
-                : 'Valores menores contam como favoráveis.'
+                ? t('Valores maiores contam como favoráveis.')
+                : t('Valores menores contam como favoráveis.')
             }
           >
             <Select
@@ -166,7 +176,7 @@ export function MetricFormDialog({ metric, onClose, onSaved }: MetricFormDialogP
               }}
               aria-invalid={Boolean(fieldErrors.desiredDirection)}
               aria-describedby={fieldAria('metric-direction', {
-                hint: 'direção',
+                hint: t('direção'),
                 error: fieldErrors.desiredDirection,
               })}
             >

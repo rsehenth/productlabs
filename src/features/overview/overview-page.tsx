@@ -1,12 +1,13 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { Activity, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Notice } from '@/components/ui/notice'
 import { PageHeader } from '@/components/ui/page-header'
+import { useLanguage } from '@/hooks/use-language'
 import { useWorkspace } from '@/hooks/use-workspace'
 import { metricSummary } from '@/lib/analytics'
-import { useRoute } from '@/lib/routing'
+import { routeHref, useRoute } from '@/lib/routing'
 import { ExportBackupButton } from '@/features/overview/export-backup-button'
 import { ImportBackupDialog } from '@/features/overview/import-backup-dialog'
 import { MetricCard } from '@/features/overview/metric-card'
@@ -21,6 +22,7 @@ const DemoDatasetPreview = lazy(() =>
 )
 
 export function OverviewPage() {
+  const { t } = useLanguage()
   const { workspace } = useWorkspace()
   const { params, navigate } = useRoute()
   const [createOpen, setCreateOpen] = useState(false)
@@ -28,6 +30,20 @@ export function OverviewPage() {
   const [importOpen, setImportOpen] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [noticeTone, setNoticeTone] = useState<'success' | 'info'>('success')
+
+  const metricCards = useMemo(
+    () => workspace.metrics.map((metric) => ({
+      metric,
+      summary: metricSummary(workspace, metric),
+      feedbackCount: workspace.feedbacks.filter((feedback) =>
+        feedback.metricIds.includes(metric.id),
+      ).length,
+      decisionCount: workspace.decisions.filter((decision) =>
+        decision.metricIds.includes(metric.id),
+      ).length,
+    })),
+    [workspace],
+  )
 
   const selectedMetric = params.metric
     ? (workspace.metrics.find((metric) => metric.id === params.metric) ?? null)
@@ -40,22 +56,24 @@ export function OverviewPage() {
     <>
       <PageHeader
         title="Product Overview"
-        description="Acompanhe indicadores, identifique variações e conecte sinais quantitativos às suas investigações de produto."
+        description={t(
+          'Conecte métricas e feedbacks para formular hipóteses, comparar alternativas e documentar decisões de produto fundamentadas em evidências.',
+        )}
         actions={
           <>
             <ExportBackupButton
-              label="Exportar backup"
+              label={t('Exportar backup')}
               onExported={(message, compatible) => {
                 setNoticeTone(compatible ? 'success' : 'info')
                 setNotice(message)
               }}
             />
             <Button variant="outline" onClick={() => setImportOpen(true)}>
-              Importar backup
+              {t('Importar backup')}
             </Button>
-            <Button onClick={() => setCreateOpen(true)}>
+            <Button data-tour-id="metric-new" onClick={() => setCreateOpen(true)}>
               <Plus aria-hidden="true" />
-              Novo indicador
+              {t('Novo indicador')}
             </Button>
           </>
         }
@@ -67,31 +85,57 @@ export function OverviewPage() {
         </Notice>
       ) : null}
 
+      <section data-tour-id="local-data" aria-labelledby="local-data-title" className="rounded-xl border border-border bg-card px-5 py-4">
+        <h2 id="local-data-title" className="text-sm font-semibold text-foreground">{t('Seus dados no workspace')}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          {t(
+            'Os registros ficam neste navegador, sem sincronização em nuvem com outros dispositivos ou perfis. Limpar os dados do site pode apagá-los definitivamente; a aplicação não faz recuperação automática. Exporte um backup manualmente pelos botões acima. Ao importar, todo o workspace atual é substituído.',
+          )}
+        </p>
+      </section>
+
       {isEmpty ? (
         <>
           <EmptyState
             icon={Activity}
-            title="Comece pelo seu primeiro indicador"
-            description="Cadastre uma métrica de produto e acompanhe sua evolução ao longo do tempo. Os dados ficam apenas neste navegador."
+            title={t('Comece pelo seu primeiro indicador')}
+            description={t(
+              'Cadastre uma métrica de produto e acompanhe sua evolução ao longo do tempo. Os dados ficam apenas neste navegador.',
+            )}
           >
             <Button onClick={() => setCreateOpen(true)}>
               <Plus aria-hidden="true" />
-              Criar indicador
+              {t('Criar indicador')}
             </Button>
           </EmptyState>
 
-          <section aria-labelledby="demo-preview-title" className="space-y-3">
+          <section aria-labelledby="start-title" className="space-y-2">
+            <h2 id="start-title" className="font-display text-xl font-semibold tracking-tight text-foreground">
+              {t('Explore o laboratório')}
+            </h2>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              <a className="text-primary underline underline-offset-4" href={routeHref('feedbacks')}>{t('Registre feedbacks')}</a>{' '}
+              {t('e')}{' '}
+              <a className="text-primary underline underline-offset-4" href={routeHref('decisions')}>{t('documente decisões')}</a>{' '}
+              {t('com suas hipóteses e alternativas. Você também pode')}{' '}
+              <a className="text-primary underline underline-offset-4" href={routeHref('interactive-case')}>{t('experimentar o Interactive Case')}</a>
+              {t(', um cenário simulado separado do workspace.')}
+            </p>
+          </section>
+
+          <section data-tour-id="demo-preview" aria-labelledby="demo-preview-title" className="space-y-3">
             <div>
               <h2 id="demo-preview-title" className="font-display text-2xl font-semibold tracking-tight text-foreground">
-                Prévia demonstrativa
+                {t('Prévia demonstrativa')}
               </h2>
               <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                Esta prévia usa um produto fictício e não é gravada no workspace. Seus dados
-                começam vazios e permanecem separados.
+                {t(
+                  'Esta prévia usa um produto fictício e não é gravada no workspace. Seus registros permanecem separados.',
+                )}
               </p>
             </div>
             <Suspense
-              fallback={<p className="text-sm text-muted-foreground">Carregando prévia…</p>}
+              fallback={<p role="status" className="text-sm text-muted-foreground">{t('Carregando prévia…')}</p>}
             >
               <DemoDatasetPreview />
             </Suspense>
@@ -99,13 +143,13 @@ export function OverviewPage() {
         </>
       ) : (
         <>
-          <section aria-label="Resumo do workspace">
+          <section aria-label={t('Resumo do workspace')}>
             <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border lg:grid-cols-4">
               {[
-                { label: 'Indicadores', value: workspace.metrics.length },
-                { label: 'Observações', value: totalObservations },
-                { label: 'Feedbacks', value: workspace.feedbacks.length },
-                { label: 'Decisões', value: workspace.decisions.length },
+                { label: t('Indicadores'), value: workspace.metrics.length },
+                { label: t('Observações'), value: totalObservations },
+                { label: t('Feedbacks'), value: workspace.feedbacks.length },
+                { label: t('Decisões'), value: workspace.decisions.length },
               ].map(({ label, value }) => (
                 <div key={label} className="bg-card px-5 py-4">
                   <dt className="text-sm text-muted-foreground">{label}</dt>
@@ -117,32 +161,24 @@ export function OverviewPage() {
             </dl>
           </section>
 
-          <section aria-labelledby="metrics-title" className="space-y-4">
+          <section data-tour-id="metric-list" aria-labelledby="metrics-title" className="space-y-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 id="metrics-title" className="font-display text-2xl font-semibold tracking-tight text-foreground">
-                Indicadores
+                {t('Indicadores')}
               </h2>
               <p className="font-mono text-xs text-muted-foreground">
-                {workspace.metrics.length} cadastrado(s)
+                {t('{count} cadastrado(s)', { count: workspace.metrics.length })}
               </p>
             </div>
 
             <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))] gap-4">
-              {workspace.metrics.map((metric) => (
+              {metricCards.map(({ metric, summary, feedbackCount, decisionCount }) => (
                 <MetricCard
                   key={metric.id}
                   metric={metric}
-                  summary={metricSummary(workspace, metric)}
-                  feedbackCount={
-                    workspace.feedbacks.filter((feedback) =>
-                      feedback.metricIds.includes(metric.id),
-                    ).length
-                  }
-                  decisionCount={
-                    workspace.decisions.filter((decision) =>
-                      decision.metricIds.includes(metric.id),
-                    ).length
-                  }
+                  summary={summary}
+                  feedbackCount={feedbackCount}
+                  decisionCount={decisionCount}
                   onOpen={() => navigate('overview', { metric: metric.id })}
                 />
               ))}
@@ -157,7 +193,7 @@ export function OverviewPage() {
           onSaved={(metric) => {
             setCreateOpen(false)
             setNoticeTone('success')
-            setNotice('Indicador criado.')
+            setNotice(t('Indicador criado.'))
             navigate('overview', { metric: metric.id })
           }}
         />
@@ -170,7 +206,7 @@ export function OverviewPage() {
           onSaved={() => {
             setEditingMetric(null)
             setNoticeTone('success')
-            setNotice('Indicador atualizado.')
+            setNotice(t('Indicador atualizado.'))
           }}
         />
       ) : null}
@@ -187,7 +223,7 @@ export function OverviewPage() {
           onDeleted={() => {
             navigate('overview')
             setNoticeTone('success')
-            setNotice('Indicador excluído.')
+            setNotice(t('Indicador excluído.'))
           }}
         />
       ) : null}
@@ -199,7 +235,15 @@ export function OverviewPage() {
             setImportOpen(false)
             setNoticeTone('success')
             setNotice(
-              `Backup importado: ${summary.metrics} indicadores, ${summary.observations} observações, ${summary.feedbacks} feedbacks e ${summary.decisions} decisões.`,
+              t(
+                'Backup importado: {metrics} indicadores, {observations} observações, {feedbacks} feedbacks e {decisions} decisões.',
+                {
+                  metrics: summary.metrics,
+                  observations: summary.observations,
+                  feedbacks: summary.feedbacks,
+                  decisions: summary.decisions,
+                },
+              ),
             )
           }}
         />

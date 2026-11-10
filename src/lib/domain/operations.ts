@@ -11,6 +11,7 @@ import type {
 } from '@/types/domain'
 import type { WorkspaceState } from '@/types/workspace'
 import { createId } from '@/lib/ids'
+import { localizedRecord, t } from '@/lib/i18n'
 import { decisionStatusErrors } from './decision-rules'
 import { isValidIsoMonth, nowIso } from '@/lib/dates'
 import { metricValueError } from '@/lib/number'
@@ -53,7 +54,7 @@ export interface OperationOptions {
 }
 
 function failure(fieldErrors: FieldErrors, details?: string[]): OperationFailure {
-  const error = Object.values(fieldErrors)[0] ?? 'Não foi possível concluir a operação.'
+  const error = Object.values(fieldErrors)[0] ?? t('Não foi possível concluir a operação.')
   return { ok: false, error, fieldErrors, ...(details ? { details } : {}) }
 }
 
@@ -73,9 +74,12 @@ function requiredText(
   errors: FieldErrors,
 ): string {
   const trimmed = value.trim()
-  if (!trimmed) errors[field] = `${label} é obrigatório.`
+  if (!trimmed) errors[field] = t('{label} é obrigatório.', { label: t(label) })
   else if (trimmed.length > max) {
-    errors[field] = `${label} deve ter no máximo ${max} caracteres.`
+    errors[field] = t('{label} deve ter no máximo {max} caracteres.', {
+      label: t(label),
+      max,
+    })
   }
   return trimmed
 }
@@ -88,7 +92,12 @@ function optionalText(
   errors: FieldErrors,
 ): string {
   const trimmed = value.trim()
-  if (trimmed.length > max) errors[field] = `${label} deve ter no máximo ${max} caracteres.`
+  if (trimmed.length > max) {
+    errors[field] = t('{label} deve ter no máximo {max} caracteres.', {
+      label: t(label),
+      max,
+    })
+  }
   return trimmed
 }
 
@@ -100,11 +109,17 @@ function normalizeList(
 ): string[] {
   const normalized = values.map((value) => value.trim()).filter(Boolean)
   if (normalized.length > FIELD_LIMITS.maxListItems) {
-    errors[field] = `${label} deve ter no máximo ${FIELD_LIMITS.maxListItems} itens.`
+    errors[field] = t('{label} deve ter no máximo {max} itens.', {
+      label: t(label),
+      max: FIELD_LIMITS.maxListItems,
+    })
   }
   normalized.forEach((value, index) => {
     if (value.length > FIELD_LIMITS.listItem) {
-      errors[field] = `O item ${index + 1} de ${label.toLowerCase()} é muito longo.`
+      errors[field] = t('O item {index} de {label} é muito longo.', {
+        index: index + 1,
+        label: t(label).toLowerCase(),
+      })
     }
   })
   return normalized
@@ -118,24 +133,29 @@ function validateIds(
   errors: FieldErrors,
 ): string[] {
   if (new Set(ids).size !== ids.length) {
-    errors[field] = `${label} não podem se repetir.`
+    errors[field] = t('{label} não podem se repetir.', { label: t(label) })
     return ids
   }
   if (ids.length > FIELD_LIMITS.maxEvidence) {
-    errors[field] = `Selecione no máximo ${FIELD_LIMITS.maxEvidence} ${label.toLowerCase()}.`
+    errors[field] = t('Selecione no máximo {max} {label}.', {
+      max: FIELD_LIMITS.maxEvidence,
+      label: t(label).toLowerCase(),
+    })
     return ids
   }
   if (ids.some((id) => !available.has(id))) {
-    errors[field] = `Um dos registros selecionados em ${label.toLowerCase()} não existe mais.`
+    errors[field] = t('Um dos registros selecionados em {label} não existe mais.', {
+      label: t(label).toLowerCase(),
+    })
   }
   return ids
 }
 
 function isoDateTimeError(value: string): string | undefined {
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?(Z|[+-]\d{2}:\d{2})$/.test(value)) {
-    return 'Informe uma data válida.'
+    return t('Informe uma data válida.')
   }
-  if (Number.isNaN(Date.parse(value))) return 'Informe uma data válida.'
+  if (Number.isNaN(Date.parse(value))) return t('Informe uma data válida.')
   return undefined
 }
 
@@ -176,9 +196,9 @@ function normalizeMetricInput(input: MetricInput): {
     FIELD_LIMITS.metricDescription,
     errors,
   )
-  if (!isOneOf(input.unit, METRIC_UNITS)) errors.unit = 'Selecione uma unidade válida.'
+  if (!isOneOf(input.unit, METRIC_UNITS)) errors.unit = t('Selecione uma unidade válida.')
   if (!isOneOf(input.desiredDirection, METRIC_DIRECTIONS)) {
-    errors.desiredDirection = 'Selecione a direção desejada.'
+    errors.desiredDirection = t('Selecione a direção desejada.')
   }
   return {
     errors,
@@ -201,7 +221,7 @@ export function createMetric(
 
   const id = options.id ?? createId('metric')
   if (state.metrics.some((metric) => metric.id === id)) {
-    return failure({ id: 'Já existe um indicador com este identificador.' })
+    return failure({ id: t('Já existe um indicador com este identificador.') })
   }
 
   const metric: ProductMetric = {
@@ -218,7 +238,7 @@ export function updateMetric(
   input: MetricInput,
 ): OperationResult<ProductMetric> {
   const existing = state.metrics.find((metric) => metric.id === id)
-  if (!existing) return failure({ id: 'Indicador não encontrado.' })
+  if (!existing) return failure({ id: t('Indicador não encontrado.') })
 
   const { errors, value } = normalizeMetricInput(input)
   if (Object.keys(errors).length > 0) return failure(errors)
@@ -239,19 +259,26 @@ export interface MetricDeletion {
 
 export function deleteMetric(state: WorkspaceState, id: string): OperationResult<MetricDeletion> {
   const metric = state.metrics.find((item) => item.id === id)
-  if (!metric) return failure({ id: 'Indicador não encontrado.' })
+  if (!metric) return failure({ id: t('Indicador não encontrado.') })
 
   const decisions = state.decisions.filter((decision) => decision.metricIds.includes(id))
   const feedbacks = state.feedbacks.filter((feedback) => feedback.metricIds.includes(id))
 
   if (decisions.length > 0 || feedbacks.length > 0) {
     const details = [
-      ...decisions.map((decision) => `Decisão: ${decision.title}`),
-      ...feedbacks.map((feedback) => `Feedback: ${truncate(feedback.content, 90)}`),
+      ...decisions.map((decision) =>
+        t('Decisão: {title}', { title: decision.title }),
+      ),
+      ...feedbacks.map((feedback) =>
+        t('Feedback: {content}', { content: truncate(feedback.content, 90) }),
+      ),
     ]
     return failure(
       {
-        id: `Este indicador está vinculado a ${decisions.length} decisão(ões) e ${feedbacks.length} feedback(s). Remova os vínculos antes de excluir.`,
+        id: t(
+          'Este indicador está vinculado a {decisions} decisão(ões) e {feedbacks} feedback(s). Remova os vínculos antes de excluir.',
+          { decisions: decisions.length, feedbacks: feedbacks.length },
+        ),
       },
       details,
     )
@@ -293,7 +320,7 @@ function duplicatePeriodError(
       observation.period === period &&
       observation.id !== ignoreId,
   )
-  return duplicate ? 'Já existe uma observação para este indicador neste período.' : undefined
+  return duplicate ? t('Já existe uma observação para este indicador neste período.') : undefined
 }
 
 function validateObservation(
@@ -303,17 +330,17 @@ function validateObservation(
 ): { errors: FieldErrors; period: string } {
   const errors: FieldErrors = {}
   const metric = state.metrics.find((item) => item.id === input.metricId)
-  if (!metric) errors.metricId = 'Indicador não encontrado.'
+  if (!metric) errors.metricId = t('Indicador não encontrado.')
 
   const period = input.period.trim()
-  if (!isValidIsoMonth(period)) errors.period = 'Use o formato AAAA-MM.'
+  if (!isValidIsoMonth(period)) errors.period = t('Use o formato AAAA-MM.')
   else {
     const duplicate = duplicatePeriodError(state, input.metricId, period, ignoreId)
     if (duplicate) errors.period = duplicate
   }
 
   if (!Number.isFinite(input.value)) {
-    errors.value = 'Informe um número válido.'
+    errors.value = t('Informe um número válido.')
   } else if (metric) {
     const valueError = metricValueError(input.value, metric.unit)
     if (valueError) errors.value = valueError
@@ -332,7 +359,7 @@ export function createObservation(
 
   const id = options.id ?? createId('observation')
   if (state.observations.some((observation) => observation.id === id)) {
-    return failure({ id: 'Já existe uma observação com este identificador.' })
+    return failure({ id: t('Já existe uma observação com este identificador.') })
   }
 
   const observation: MetricObservation = {
@@ -355,7 +382,7 @@ export function updateObservation(
   options: Pick<OperationOptions, 'now'> = {},
 ): OperationResult<MetricObservation> {
   const existing = state.observations.find((observation) => observation.id === id)
-  if (!existing) return failure({ id: 'Observação não encontrada.' })
+  if (!existing) return failure({ id: t('Observação não encontrada.') })
 
   const { errors, period } = validateObservation(state, input, id)
   if (Object.keys(errors).length > 0) return failure(errors)
@@ -383,7 +410,7 @@ export function deleteObservation(
   id: string,
 ): OperationResult<MetricObservation> {
   const observation = state.observations.find((item) => item.id === id)
-  if (!observation) return failure({ id: 'Observação não encontrada.' })
+  if (!observation) return failure({ id: t('Observação não encontrada.') })
   return success(
     {
       ...state,
@@ -426,10 +453,10 @@ function normalizeFeedbackInput(
     errors,
   )
   if (!isOneOf(input.category, FEEDBACK_CATEGORIES)) {
-    errors.category = 'Selecione uma categoria válida.'
+    errors.category = t('Selecione uma categoria válida.')
   }
   if (!isOneOf(input.source, FEEDBACK_SOURCES)) {
-    errors.source = 'Selecione uma fonte válida.'
+    errors.source = t('Selecione uma fonte válida.')
   }
   const dateError = isoDateTimeError(input.receivedAt)
   if (dateError) errors.receivedAt = dateError
@@ -464,7 +491,7 @@ export function createFeedback(
 
   const id = options.id ?? createId('feedback')
   if (state.feedbacks.some((feedback) => feedback.id === id)) {
-    return failure({ id: 'Já existe um feedback com este identificador.' })
+    return failure({ id: t('Já existe um feedback com este identificador.') })
   }
   const feedback: UserFeedback = { id, ...value }
   return success({ ...state, feedbacks: [...state.feedbacks, feedback] }, feedback)
@@ -476,7 +503,7 @@ export function updateFeedback(
   input: FeedbackInput,
 ): OperationResult<UserFeedback> {
   const existing = state.feedbacks.find((feedback) => feedback.id === id)
-  if (!existing) return failure({ id: 'Feedback não encontrado.' })
+  if (!existing) return failure({ id: t('Feedback não encontrado.') })
 
   const { errors, value } = normalizeFeedbackInput(state, input)
   if (Object.keys(errors).length > 0) return failure(errors)
@@ -496,15 +523,18 @@ export function deleteFeedback(
   id: string,
 ): OperationResult<UserFeedback> {
   const feedback = state.feedbacks.find((item) => item.id === id)
-  if (!feedback) return failure({ id: 'Feedback não encontrado.' })
+  if (!feedback) return failure({ id: t('Feedback não encontrado.') })
 
   const decisions = state.decisions.filter((decision) => decision.feedbackIds.includes(id))
   if (decisions.length > 0) {
     return failure(
       {
-        id: `Este feedback é evidência de ${decisions.length} decisão(ões). Remova o vínculo antes de excluir.`,
+        id: t(
+          'Este feedback é evidência de {count} decisão(ões). Remova o vínculo antes de excluir.',
+          { count: decisions.length },
+        ),
       },
-      decisions.map((decision) => `Decisão: ${decision.title}`),
+      decisions.map((decision) => t('Decisão: {title}', { title: decision.title })),
     )
   }
 
@@ -544,14 +574,24 @@ interface NormalizedDecision {
   status: DecisionStatus
 }
 
-export const DECISION_STATUS_RULES: Record<DecisionStatus, string> = {
-  draft: 'Rascunho exige título e problema.',
-  investigating: 'Em investigação exige título, problema e hipótese.',
-  decided: 'Decidida exige título, problema, hipótese e decisão registrada.',
-  validated:
-    'Validada exige título, problema, hipótese, decisão e ao menos um critério de sucesso.',
-  abandoned: 'Abandonada exige título e problema.',
-}
+export const DECISION_STATUS_RULES = localizedRecord<DecisionStatus>(
+  {
+    draft: 'Rascunho exige título e problema.',
+    investigating: 'Em investigação exige título, problema e hipótese.',
+    decided: 'Decidida exige título, problema, hipótese e decisão registrada.',
+    validated:
+      'Validada exige título, problema, hipótese, decisão e ao menos um critério de sucesso.',
+    abandoned: 'Abandonada exige título e problema.',
+  },
+  {
+    draft: 'Draft requires a title and a problem.',
+    investigating: 'Investigating requires a title, a problem and a hypothesis.',
+    decided: 'Decided requires a title, a problem, a hypothesis and a recorded decision.',
+    validated:
+      'Validated requires a title, a problem, a hypothesis, a decision and at least one success criterion.',
+    abandoned: 'Abandoned requires a title and a problem.',
+  },
+)
 
 function normalizeDecisionInput(
   state: WorkspaceState,
@@ -601,7 +641,7 @@ function normalizeDecisionInput(
   const nextSteps = normalizeList(input.nextSteps, 'nextSteps', 'Próximos passos', errors)
 
   if (!isOneOf(input.status, DECISION_STATUSES)) {
-    errors.status = 'Selecione um status válido.'
+    errors.status = t('Selecione um status válido.')
   }
 
   Object.assign(
@@ -651,7 +691,7 @@ export function createDecision(
 
   const id = options.id ?? createId('decision')
   if (state.decisions.some((decision) => decision.id === id)) {
-    return failure({ id: 'Já existe uma decisão com este identificador.' })
+    return failure({ id: t('Já existe uma decisão com este identificador.') })
   }
   const timestamp = options.now ?? nowIso()
   const record: DecisionRecord = {
@@ -670,7 +710,7 @@ export function updateDecision(
   options: Pick<OperationOptions, 'now'> = {},
 ): OperationResult<DecisionRecord> {
   const existing = state.decisions.find((decision) => decision.id === id)
-  if (!existing) return failure({ id: 'Decisão não encontrada.' })
+  if (!existing) return failure({ id: t('Decisão não encontrada.') })
 
   const { errors, value } = normalizeDecisionInput(state, input)
   if (Object.keys(errors).length > 0) return failure(errors)
@@ -694,7 +734,7 @@ export function deleteDecision(
   id: string,
 ): OperationResult<DecisionRecord> {
   const decision = state.decisions.find((item) => item.id === id)
-  if (!decision) return failure({ id: 'Decisão não encontrada.' })
+  if (!decision) return failure({ id: t('Decisão não encontrada.') })
   return success(
     { ...state, decisions: state.decisions.filter((item) => item.id !== id) },
     decision,

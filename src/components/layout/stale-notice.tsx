@@ -1,20 +1,24 @@
 import { useContext } from 'react'
 import { Button } from '@/components/ui/button'
 import { Notice } from '@/components/ui/notice'
+import { useLanguage } from '@/hooks/use-language'
 import { WorkspaceContext } from '@/hooks/use-workspace'
 
 /** WFA-01: aviso de Workspace desatualizado, com o caminho seguro de recuperação. */
 export function StaleNotice() {
+  const { t } = useLanguage()
   const workspace = useContext(WorkspaceContext)
   if (!workspace?.stale) return null
   const { refreshWorkspace } = workspace
 
   return (
     <Notice tone="warning">
-      <p className="font-semibold">Workspace desatualizado</p>
-      <p>Outra aba alterou os dados. Tentativas de gravação recusadas não salvam alterações.</p>
+      <p className="font-semibold">{t('Workspace desatualizado')}</p>
       <p>
-        Atualize os dados e revise o que digitou antes de tentar salvar novamente.
+        {t('Outra aba alterou os dados. Tentativas de gravação recusadas não salvam alterações.')}
+      </p>
+      <p>
+        {t('Atualize os dados e revise o que digitou antes de tentar salvar novamente.')}
       </p>
       <Button
         variant="outline"
@@ -31,7 +35,7 @@ export function StaleNotice() {
           refreshWorkspace()
         }}
       >
-        Atualizar dados
+        {t('Atualizar dados')}
       </Button>
     </Notice>
   )

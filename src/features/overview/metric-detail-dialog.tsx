@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Notice } from '@/components/ui/notice'
+import { useLanguage } from '@/hooks/use-language'
 import { useWorkspace } from '@/hooks/use-workspace'
 import { metricSummary } from '@/lib/analytics'
 import {
@@ -56,6 +57,7 @@ export function MetricDetailDialog({
   onEdit,
   onDeleted,
 }: MetricDetailDialogProps) {
+  const { t } = useLanguage()
   const { workspace, deleteMetric, deleteObservation } = useWorkspace()
   const [editor, setEditor] = useState<ObservationEditor>(null)
   const [lastMetric, setLastMetric] = useState(currentMetric)
@@ -142,7 +144,7 @@ export function MetricDetailDialog({
     }
     closeObservationConfirmation()
     setError(null)
-    setNotice('Observação excluída.')
+    setNotice(t('Observação excluída.'))
   }
 
   const hasDependencies = linkedDecisions.length > 0 || linkedFeedbacks.length > 0
@@ -158,11 +160,11 @@ export function MetricDetailDialog({
         if (!open && !deletingRef.current && !savingObservationRef.current) onClose()
       }}
       title={metric.name}
-      description={metric.description || 'Sem descrição registrada.'}
+      description={metric.description || t('Sem descrição registrada.')}
       className="max-w-4xl"
       footer={
         <Button variant="outline" onClick={onClose} disabled={busy}>
-          Fechar
+          {t('Fechar')}
         </Button>
       }
     >
@@ -190,20 +192,22 @@ export function MetricDetailDialog({
           <span aria-hidden="true">·</span>
           <span className="inline-flex items-center gap-1">
             <DesiredIcon className="size-3.5" aria-hidden="true" />
-            Direção desejada: {METRIC_DIRECTION_LABELS[metric.desiredDirection].toLowerCase()}
+            {t('Direção desejada: {direction}', {
+              direction: METRIC_DIRECTION_LABELS[metric.desiredDirection].toLowerCase(),
+            })}
           </span>
           <span aria-hidden="true">·</span>
-          <span>{summary.observations.length} observações</span>
+          <span>{t('{count} observações', { count: summary.observations.length })}</span>
         </p>
 
         <section aria-labelledby="metric-summary-title">
           <h2 id="metric-summary-title" className="sr-only">
-            Situação atual
+            {t('Situação atual')}
           </h2>
           {latest ? (
             <div className="grid gap-px overflow-hidden rounded-xl border border-border bg-border wrap-anywhere sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
               <div className="bg-card px-5 py-4">
-                <p className="text-xs text-muted-foreground">Último valor registrado</p>
+                <p className="text-xs text-muted-foreground">{t('Último valor registrado')}</p>
                 <p className="mt-2 font-mono text-4xl leading-none font-medium tracking-[-0.07em] text-foreground tabular-nums">
                   {formatMetricValue(latest.value, metric.unit)}
                 </p>
@@ -218,7 +222,7 @@ export function MetricDetailDialog({
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="flex items-center gap-1.5 font-mono text-lg font-medium text-foreground tabular-nums">
                         <DirectionIcon className="size-4 text-muted-foreground" aria-hidden="true" />
-                        <span className="sr-only">Variação absoluta: </span>
+                        <span className="sr-only">{t('Variação absoluta: ')}</span>
                         {formatAbsoluteVariation(variation.absolute, metric.unit)}
                       </p>
                       <VariationBadge favorable={variation.favorable} />
@@ -231,26 +235,31 @@ export function MetricDetailDialog({
                           <span className="font-mono text-foreground">
                             {formatRelativeVariation(variation.relative)}
                           </span>{' '}
-                          em termos relativos
+                          {t('em termos relativos')}
                         </>
                       )}
                     </p>
                     <p className="text-xs leading-relaxed text-muted-foreground">
                       {variation.direction === 'flat'
-                        ? 'Sem variação em relação ao período anterior.'
-                        : `Antes: ${formatMetricValue(variation.previous.value, metric.unit)} em ${formatPeriod(variation.previous.period)}`}
+                        ? t('Sem variação em relação ao período anterior.')
+                        : t('Antes: {value} em {period}', {
+                            value: formatMetricValue(variation.previous.value, metric.unit),
+                            period: formatPeriod(variation.previous.period),
+                          })}
                     </p>
                     {variation.favorable === false ? (
                       <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                        O aplicativo não determina a causa da variação.
+                        {t('O aplicativo não determina a causa da variação.')}
                       </p>
                     ) : null}
                   </>
                 ) : (
                   <>
-                    <Badge variant="outline">Sem comparação</Badge>
+                    <Badge variant="outline">{t('Sem comparação')}</Badge>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      Histórico insuficiente para comparação. Registre ao menos duas observações.
+                      {t(
+                        'Histórico insuficiente para comparação. Registre ao menos duas observações.',
+                      )}
                     </p>
                   </>
                 )}
@@ -261,7 +270,7 @@ export function MetricDetailDialog({
 
         {summary.observations.length > 0 ? (
           <Suspense
-            fallback={<p className="text-sm text-muted-foreground">Carregando gráfico…</p>}
+            fallback={<p role="status" className="text-sm text-muted-foreground">{t('Carregando gráfico…')}</p>}
           >
             <MetricChart metric={metric} observations={summary.observations} />
           </Suspense>
@@ -273,7 +282,7 @@ export function MetricDetailDialog({
               id="metric-history-title"
               className="font-display text-xl font-semibold tracking-[-0.02em] text-foreground"
             >
-              Histórico de observações
+              {t('Histórico de observações')}
             </h2>
             <Button
               ref={addObservation}
@@ -287,7 +296,7 @@ export function MetricDetailDialog({
               }}
               disabled={editor !== null || deleting}
             >
-              Adicionar observação
+              {t('Adicionar observação')}
             </Button>
           </div>
 
@@ -303,14 +312,14 @@ export function MetricDetailDialog({
               onSaved={() => {
                 closeEditor()
                 setError(null)
-                setNotice('Observação salva.')
+                setNotice(t('Observação salva.'))
               }}
             />
           ) : null}
 
           {summary.observations.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Nenhuma observação registrada para este indicador.
+              {t('Nenhuma observação registrada para este indicador.')}
             </p>
           ) : (
             <div className="overflow-x-auto rounded-xl border border-border">
@@ -318,13 +327,13 @@ export function MetricDetailDialog({
                 <thead className="bg-muted/60 text-left text-xs text-muted-foreground">
                   <tr>
                     <th scope="col" className="px-2 py-2.5 font-medium max-sm:w-20 sm:px-4">
-                      Período
+                      {t('Período')}
                     </th>
                     <th scope="col" className="px-2 py-2.5 text-right font-medium sm:px-4">
-                      Valor
+                      {t('Valor')}
                     </th>
                     <th scope="col" className="px-2 py-2.5 text-right font-medium max-sm:w-26 sm:px-4">
-                      Ações
+                      {t('Ações')}
                     </th>
                   </tr>
                 </thead>
@@ -347,7 +356,9 @@ export function MetricDetailDialog({
                             size="sm"
                             className="max-sm:size-11 max-sm:p-0"
                             disabled={busy}
-                            aria-label={`Editar observação de ${formatPeriod(observation.period)}`}
+                            aria-label={t('Editar observação de {period}', {
+                              period: formatPeriod(observation.period),
+                            })}
                             onClick={(event) => {
                               editTrigger.current = event.currentTarget
                               setEditor({ mode: 'edit', observation })
@@ -355,21 +366,23 @@ export function MetricDetailDialog({
                             }}
                           >
                             <Pencil className="sm:hidden" aria-hidden="true" />
-                            <span className="max-sm:sr-only">Editar</span>
+                            <span className="max-sm:sr-only">{t('Editar')}</span>
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             className="hover:bg-destructive/10 hover:text-destructive-foreground max-sm:size-11 max-sm:p-0"
                             disabled={busy}
-                            aria-label={`Excluir observação de ${formatPeriod(observation.period)}`}
+                            aria-label={t('Excluir observação de {period}', {
+                              period: formatPeriod(observation.period),
+                            })}
                             onClick={(event) => {
                               deleteTrigger.current = event.currentTarget
                               setDeletingObservation(observation)
                             }}
                           >
                             <Trash2 className="sm:hidden" aria-hidden="true" />
-                            <span className="max-sm:sr-only">Excluir</span>
+                            <span className="max-sm:sr-only">{t('Excluir')}</span>
                           </Button>
                         </div>
                       </td>
@@ -383,16 +396,14 @@ export function MetricDetailDialog({
           {deletingObservation ? (
             <div
               role="group"
-              aria-label="Confirmar exclusão da observação"
+              aria-label={t('Confirmar exclusão da observação')}
               className="rounded-xl border border-destructive/40 bg-destructive/10 p-4"
             >
               <p className="text-sm text-foreground">
-                Excluir a observação de{' '}
-                <span className="font-mono">{formatPeriod(deletingObservation.period)}</span> (
-                <span className="font-mono">
-                  {formatMetricValue(deletingObservation.value, metric.unit)}
-                </span>
-                )? Esta ação não pode ser desfeita.
+                {t('Excluir a observação de {period} ({value})? Esta ação não pode ser desfeita.', {
+                  period: formatPeriod(deletingObservation.period),
+                  value: formatMetricValue(deletingObservation.value, metric.unit),
+                })}
               </p>
               <div className="mt-3 flex flex-wrap justify-end gap-2">
                 <Button
@@ -403,7 +414,7 @@ export function MetricDetailDialog({
                   disabled={busy}
                   onClick={closeObservationConfirmation}
                 >
-                  Cancelar
+                  {t('Cancelar')}
                 </Button>
                 <Button
                   variant="destructive"
@@ -412,7 +423,7 @@ export function MetricDetailDialog({
                   disabled={busy}
                   onClick={() => handleObservationDelete(deletingObservation)}
                 >
-                  {deleting ? 'Excluindo…' : 'Confirmar exclusão'}
+                  {deleting ? t('Excluindo…') : t('Confirmar exclusão')}
                 </Button>
               </div>
             </div>
@@ -424,19 +435,19 @@ export function MetricDetailDialog({
             id="metric-evidence-title"
             className="font-display text-xl font-semibold tracking-[-0.02em] text-foreground"
           >
-            Evidências vinculadas
+            {t('Evidências vinculadas')}
           </h2>
           <div className="grid gap-3 md:grid-cols-2">
             <div className="rounded-xl border border-border p-4">
               <h3 className="text-sm font-medium text-foreground">
-                Feedbacks{' '}
+                {t('Feedbacks')}{' '}
                 <span className="font-mono text-xs font-normal text-muted-foreground">
                   ({linkedFeedbacks.length})
                 </span>
               </h3>
               {linkedFeedbacks.length === 0 ? (
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Nenhum feedback vinculado a este indicador.
+                  {t('Nenhum feedback vinculado a este indicador.')}
                 </p>
               ) : (
                 <ul className="mt-2 space-y-2">
@@ -457,20 +468,20 @@ export function MetricDetailDialog({
                 href={locationHref('feedbacks')}
                 className="mt-3 inline-block text-xs text-primary underline-offset-4 hover:underline"
               >
-                Abrir Feedbacks
+                {t('Abrir Feedbacks')}
               </a>
             </div>
 
             <div className="rounded-xl border border-border p-4">
               <h3 className="text-sm font-medium text-foreground">
-                Decisões{' '}
+                {t('Decisões')}{' '}
                 <span className="font-mono text-xs font-normal text-muted-foreground">
                   ({linkedDecisions.length})
                 </span>
               </h3>
               {linkedDecisions.length === 0 ? (
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Nenhuma decisão vinculada a este indicador.
+                  {t('Nenhuma decisão vinculada a este indicador.')}
                 </p>
               ) : (
                 <ul className="mt-2 space-y-2">
@@ -493,7 +504,7 @@ export function MetricDetailDialog({
                 href={locationHref('decisions')}
                 className="mt-3 inline-block text-xs text-primary underline-offset-4 hover:underline"
               >
-                Abrir Decisions
+                {t('Abrir Decisions')}
               </a>
             </div>
           </div>
@@ -504,11 +515,11 @@ export function MetricDetailDialog({
             id="metric-danger-title"
             className="font-display text-xl font-semibold tracking-[-0.02em] text-foreground"
           >
-            Gerenciar indicador
+            {t('Gerenciar indicador')}
           </h2>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => onEdit(metric)} disabled={busy}>
-              Editar indicador
+              {t('Editar indicador')}
             </Button>
             {!hasDependencies && !confirmMetricDelete ? (
               <Button
@@ -518,7 +529,7 @@ export function MetricDetailDialog({
                 disabled={busy}
                 onClick={() => setConfirmMetricDelete(true)}
               >
-                Excluir indicador
+                {t('Excluir indicador')}
               </Button>
             ) : null}
           </div>
@@ -526,15 +537,19 @@ export function MetricDetailDialog({
           {hasDependencies ? (
             <Notice tone="error">
               <p>
-                Este indicador está vinculado a {linkedDecisions.length} decisão(ões) e{' '}
-                {linkedFeedbacks.length} feedback(s). Remova os vínculos antes de excluir.
+                {t(
+                  'Este indicador está vinculado a {decisions} decisão(ões) e {feedbacks} feedback(s). Remova os vínculos antes de excluir.',
+                  { decisions: linkedDecisions.length, feedbacks: linkedFeedbacks.length },
+                )}
               </p>
               <ul className="mt-1 space-y-0.5 text-xs">
                 {linkedDecisions.map((decision) => (
-                  <li key={decision.id}>Decisão: {decision.title}</li>
+                  <li key={decision.id}>{t('Decisão: {title}', { title: decision.title })}</li>
                 ))}
                 {linkedFeedbacks.map((feedback) => (
-                  <li key={feedback.id}>Feedback: {truncate(feedback.content, 70)}</li>
+                  <li key={feedback.id}>
+                    {t('Feedback: {content}', { content: truncate(feedback.content, 70) })}
+                  </li>
                 ))}
               </ul>
             </Notice>
@@ -543,12 +558,14 @@ export function MetricDetailDialog({
           {confirmMetricDelete ? (
             <div
               role="group"
-              aria-label="Confirmar exclusão do indicador"
+              aria-label={t('Confirmar exclusão do indicador')}
               className="rounded-xl border border-destructive/40 bg-destructive/10 p-4"
             >
               <p className="text-sm text-foreground">
-                Excluir este indicador também removerá {summary.observations.length}{' '}
-                observação(ões). Esta ação não pode ser desfeita.
+                {t(
+                  'Excluir este indicador também removerá {count} observação(ões). Esta ação não pode ser desfeita.',
+                  { count: summary.observations.length },
+                )}
               </p>
               <div className="mt-3 flex flex-wrap justify-end gap-2">
                 <Button
@@ -559,10 +576,10 @@ export function MetricDetailDialog({
                   disabled={busy}
                   onClick={closeMetricConfirmation}
                 >
-                  Cancelar
+                  {t('Cancelar')}
                 </Button>
                 <Button variant="destructive" size="sm" className="max-sm:min-h-11" disabled={busy} onClick={() => handleMetricDelete(metric.id)}>
-                  {deleting ? 'Excluindo…' : 'Confirmar exclusão'}
+                  {deleting ? t('Excluindo…') : t('Confirmar exclusão')}
                 </Button>
               </div>
             </div>

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { CaseKindTag } from '@/features/interactive-case/case-kind-tag'
 import { Card, CardContent } from '@/components/ui/card'
 import { Notice } from '@/components/ui/notice'
+import { useLanguage } from '@/hooks/use-language'
 import type { CaseDecisionSummaryContent } from '@/features/interactive-case/case-decision-view'
 
 interface CaseDecisionSummaryProps {
@@ -36,21 +37,22 @@ function SummaryBlock({
 }
 
 export function CaseDecisionSummary({ summary, missingMessages }: CaseDecisionSummaryProps) {
+  const { t } = useLanguage()
   if (summary === null) {
     if (missingMessages.length === 0) return null
     return (
       <section aria-labelledby="case-decision-summary-title" className="space-y-3">
         <h2 id="case-decision-summary-title" className="text-lg font-semibold text-foreground">
-          Sua decisão de produto
+          {t('Sua decisão de produto')}
         </h2>
         <Notice tone="error">
-          <p className="font-medium">Ainda faltam requisitos para visualizar a síntese.</p>
+          <p className="font-medium">{t('Ainda faltam requisitos para visualizar a síntese.')}</p>
           <ul className="list-disc space-y-1 pl-4">
             {missingMessages.map((message) => (
               <li key={message}>{message}</li>
             ))}
           </ul>
-          <p>Seus dados preenchidos foram mantidos.</p>
+          <p>{t('Seus dados preenchidos foram mantidos.')}</p>
         </Notice>
       </section>
     )
@@ -59,82 +61,82 @@ export function CaseDecisionSummary({ summary, missingMessages }: CaseDecisionSu
   return (
     <section aria-labelledby="case-decision-summary-title" className="space-y-3">
       <div className="space-y-1">
-        <CaseKindTag kind="choice" note="dentro do cenário demonstrativo" />
+        <CaseKindTag kind="choice" note={t('dentro do cenário demonstrativo')} />
         <h2 id="case-decision-summary-title" className="text-lg font-semibold text-foreground">
-          Sua decisão de produto
+          {t('Sua decisão de produto')}
         </h2>
       </div>
 
-      <Notice tone="info">{EDITORIAL_NOTE}</Notice>
+      <Notice tone="info">{t(EDITORIAL_NOTE)}</Notice>
 
       <Card>
         <CardContent className="space-y-6 p-5">
-          <SummaryBlock title="Problema investigado">
-            <p className="text-sm leading-relaxed text-foreground">{summary.problem}</p>
+          <SummaryBlock title={t('Problema investigado')}>
+            <p className="text-sm leading-relaxed text-foreground">{t(summary.problem)}</p>
           </SummaryBlock>
 
-          <SummaryBlock title="Indicador em análise">
+          <SummaryBlock title={t('Indicador em análise')}>
             <p className="text-sm leading-relaxed text-foreground">
-              {summary.metricName ?? 'Nenhum indicador selecionado.'}
+              {summary.metricName ? t(summary.metricName) : t('Nenhum indicador selecionado.')}
             </p>
           </SummaryBlock>
 
-          <SummaryBlock title="Evidências escolhidas (relatos fictícios)">
+          <SummaryBlock title={t('Evidências escolhidas (relatos fictícios)')}>
             <ul className="space-y-2">
               {summary.evidence.map((view) => (
                 <li
                   key={view.id}
                   className="rounded-lg border border-l-2 border-border/70 border-l-chart-2/60 bg-background/40 p-3 text-sm leading-relaxed text-foreground"
                 >
-                  {view.content}
+                  {t(view.content)}
                 </li>
               ))}
             </ul>
           </SummaryBlock>
 
-          <SummaryBlock title="Sua hipótese (não verificada)">
+          <SummaryBlock title={t('Sua hipótese (não verificada)')}>
             <p className="whitespace-pre-line border-l-2 border-chart-3/60 pl-3 text-sm leading-relaxed text-foreground">
               {summary.hypothesis}
             </p>
           </SummaryBlock>
 
-          <SummaryBlock title="Direção escolhida">
+          <SummaryBlock title={t('Direção escolhida')}>
             <p className="text-sm font-medium leading-relaxed text-foreground">
-              {summary.option.title}
+              {t(summary.option.title)}
             </p>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              {summary.option.description}
+              {t(summary.option.description)}
             </p>
           </SummaryBlock>
 
-          <SummaryBlock title="Benefícios potenciais">
+          <SummaryBlock title={t('Benefícios potenciais')}>
             <ul className="list-disc space-y-1 pl-4 text-sm leading-relaxed text-foreground">
               {summary.option.benefits.map((benefit) => (
-                <li key={benefit}>{benefit}</li>
+                <li key={benefit}>{t(benefit)}</li>
               ))}
             </ul>
           </SummaryBlock>
 
-          <SummaryBlock title="Riscos e limitações">
+          <SummaryBlock title={t('Riscos e limitações')}>
             <ul className="list-disc space-y-1 pl-4 text-sm leading-relaxed text-foreground">
               {summary.option.risks.map((risk) => (
-                <li key={risk}>{risk}</li>
+                <li key={risk}>{t(risk)}</li>
               ))}
             </ul>
           </SummaryBlock>
 
-          <SummaryBlock title="Informações que ainda seriam necessárias">
+          <SummaryBlock title={t('Informações que ainda seriam necessárias')}>
             <ul className="list-disc space-y-1 pl-4 text-sm leading-relaxed text-foreground">
               {summary.option.additionalInformation.map((information) => (
-                <li key={information}>{information}</li>
+                <li key={information}>{t(information)}</li>
               ))}
             </ul>
           </SummaryBlock>
 
-          <Notice tone="info">{PM_NOTE}</Notice>
+          <Notice tone="info">{t(PM_NOTE)}</Notice>
 
-          <SummaryBlock title="Próximo raciocínio">
-            <p className="text-sm leading-relaxed text-foreground">{NEXT_STEP}</p>
+          <SummaryBlock title={t('Próximo raciocínio')}>
+            <p className="text-sm leading-relaxed text-foreground">{t(NEXT_STEP)}</p>
           </SummaryBlock>
         </CardContent>
       </Card>

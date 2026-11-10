@@ -8,13 +8,15 @@ import {
   YAxis,
 } from 'recharts'
 import type { MetricObservation, ProductMetric } from '@/types/domain'
+import { useLanguage } from '@/hooks/use-language'
 import { sortObservations } from '@/lib/analytics'
+import { locale } from '@/lib/i18n'
 import { formatMetricValue, formatPeriod, formatPeriodShort } from '@/lib/domain-labels'
 
 /** Moeda no eixo em notação compacta para não cortar rótulos longos; tooltip e legenda mantêm o valor exato. */
 function formatAxisValue(value: number, unit: ProductMetric['unit']): string {
   if (unit !== 'currency') return formatMetricValue(value, unit)
-  return new Intl.NumberFormat('pt-BR', {
+  return new Intl.NumberFormat(locale(), {
     style: 'currency',
     currency: 'BRL',
     notation: 'compact',
@@ -35,6 +37,7 @@ export function MetricChart({
   metric: ProductMetric
   observations: MetricObservation[]
 }) {
+  const { t: translate } = useLanguage()
   const series = sortObservations(observations).map((observation) => ({
     period: observation.period,
     value: observation.value,
@@ -47,11 +50,25 @@ export function MetricChart({
   return (
     <figure className="rounded-lg border border-border bg-card p-4">
       <figcaption className="sr-only">
-        Evolução de {metric.name} com {series.length} observação(ões)
-        {first && last
-          ? `, de ${formatMetricValue(first.value, metric.unit)} em ${formatPeriod(first.period)} a ${formatMetricValue(last.value, metric.unit)} em ${formatPeriod(last.period)}`
-          : ''}
-        .
+        {translate(
+          'Evolução de {name} com {count} observação(ões){range}.',
+          {
+            name: metric.name,
+            count: series.length,
+            range:
+              first && last
+                ? translate(
+                    ', de {firstValue} em {firstPeriod} a {lastValue} em {lastPeriod}',
+                    {
+                      firstValue: formatMetricValue(first.value, metric.unit),
+                      firstPeriod: formatPeriod(first.period),
+                      lastValue: formatMetricValue(last.value, metric.unit),
+                      lastPeriod: formatPeriod(last.period),
+                    },
+                  )
+                : '',
+          },
+        )}
       </figcaption>
       <div className="h-60 w-full" aria-hidden="true">
         <ResponsiveContainer width="100%" height="100%">
@@ -118,8 +135,16 @@ export function MetricChart({
       {first && last ? (
         <p className="mt-3 text-xs text-muted-foreground">
           {series.length === 1
-            ? `Uma observação: ${formatMetricValue(first.value, metric.unit)} em ${formatPeriod(first.period)}.`
-            : `${formatMetricValue(first.value, metric.unit)} em ${formatPeriod(first.period)} → ${formatMetricValue(last.value, metric.unit)} em ${formatPeriod(last.period)}.`}
+            ? translate('Uma observação: {value} em {period}.', {
+                value: formatMetricValue(first.value, metric.unit),
+                period: formatPeriod(first.period),
+              })
+            : translate('{firstValue} em {firstPeriod} → {lastValue} em {lastPeriod}.', {
+                firstValue: formatMetricValue(first.value, metric.unit),
+                firstPeriod: formatPeriod(first.period),
+                lastValue: formatMetricValue(last.value, metric.unit),
+                lastPeriod: formatPeriod(last.period),
+              })}
         </p>
       ) : null}
     </figure>
