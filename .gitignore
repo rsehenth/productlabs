@@ -30,6 +30,9 @@ blob-report
 *.p12
 *.pfx
 
+# Documentação interna (não publicar)
+docs/
+
 # Ferramentas locais
 .playwright-mcp/
 .claude/
