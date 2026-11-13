@@ -30,8 +30,11 @@ blob-report
 *.p12
 *.pfx
 
-# Documentação interna (não publicar)
-docs/
+# Documentação interna (não publicar); guia do tour, síntese de prontidão e guia de testes acompanham o código
+docs/*
+!docs/PRODUCT-GUIDED-TOUR.md
+!docs/PRODUCT-READINESS-SUMMARY.md
+!docs/BROWSER-TESTING-GUIDE.md
 
 # Ferramentas locais
 .playwright-mcp/

@@ -50,7 +50,7 @@ flowchart LR
 | **Decision Workspace** | Build decision records with problem, linked evidence, hypothesis, alternatives, decision, success criteria, next steps, and status; export any record as Markdown. | Produces an artifact you can revisit, share, and challenge. |
 | **Interactive Product Case** | Work through a simulated ProfResolve scenario: investigate metrics, select evidence, write a hypothesis, pick an alternative, and see a summary of the reasoning. | Practices the same loop in a guided, consequence-free setting. |
 
-A guided tour behind the **How it works** button walks through all four modules inside the app.
+A guided tour behind the **How it works** button walks through all four modules inside the app. Its reference documentation, including the 15-step script and the maintenance rule, lives in [`docs/PRODUCT-GUIDED-TOUR.md`](docs/PRODUCT-GUIDED-TOUR.md).
 
 ## Screenshots
 
@@ -76,7 +76,7 @@ A guided tour behind the **How it works** button walks through all four modules 
 | Routing | Hash-based router with query parameters (`#/overview?metric=<id>`) |
 | State | Single `WorkspaceProvider` with pure domain operations and transactional commits |
 | Persistence | `localStorage` with schema versioning, integrity validation, and Web Locks |
-| Quality | Vitest, Testing Library, ESLint, `tsc -b` |
+| Quality | Vitest, ESLint, `tsc -b` |
 
 The design language is a "lab notebook" theme: near-black paper, a single highlighter-yellow accent for evidence, monospaced metadata, and locally hosted IBM Plex and Bricolage Grotesque fonts — no external font requests.
 
@@ -110,6 +110,8 @@ npm run preview   # serve the built bundle
 | `npm run typecheck` | Run `tsc -b` |
 | `npm run lint` | Run ESLint |
 
+`npm test` runs the Vitest suite only. The browser-level regression and performance harnesses (Playwright scripts under `tests/browser/`) are separate: they run against a production build served locally and require an externally installed Playwright module, which is not a project dependency. Reproduction steps, environment variables, and how to read their results are documented in [`docs/BROWSER-TESTING-GUIDE.md`](docs/BROWSER-TESTING-GUIDE.md).
+
 ## Data and privacy
 
 The workspace lives in **your browser's LocalStorage**, under `product-decision-lab:workspace`. Nothing is uploaded, and there is no automatic recovery if browser data is cleared.
@@ -138,27 +140,27 @@ assets/         screenshots used by this README
 
 ## Project status
 
-**Functional MVP, validation in progress.** All four modules are implemented, including CRUD, relationships, persistence, backup, Markdown export, the guided tour, and route-level code splitting.
+**Functional MVP, ready for demonstration with limitations.** All four modules are implemented, including CRUD, relationships, persistence, manual backup, Markdown export, the guided tour, and route-level code splitting. There is no backend, no accounts, and no synchronization by design; data lives locally with manual backup.
 
-Last verified on **10 November 2026**:
+Consolidated on **13 November 2026** from validation runs made between 10 and 12 November — Chromium headless on Windows, lab conditions, not field data:
 
 | Area | State |
 | --- | --- |
-| Unit and component tests | **403 passing** in 28 files (`npm test`) |
+| Unit tests (Vitest) | **403 passing** in 28 files (`npm test`), last full run on 11 Nov after the final production change. Coverage was not measured. |
 | Typecheck, lint, production build | **Passing** (`npm run typecheck`, `npm run lint`, `npm run build`) |
-| Browser smoke (Chromium, headless) | **Passed** — four routes, reloads, navigation, lazy chunks, no console errors in the observed flows |
-| Functional regression (Chromium) | **Passed with limitations** — metric/feedback/decision flows, validation by status, persistence, Markdown export, storage-failure handling |
-| Firefox and WebKit/Safari | **Pending** |
-| Accessibility audit (keyboard, focus, screen readers) | **Pending** — no conformance claim |
-| Responsiveness across target viewports | **Partially checked** — mobile navigation only |
-| Real-world performance measurement | **Pending** — bundle splitting is implemented, not benchmarked |
+| Functional regression (browser, Playwright) | **Passed with limitations** — metric/feedback/decision flows, validation by status, Markdown export, storage-failure handling, multi-tab conflicts, backup/import round-trip |
+| Guided tour regression | **Passed** — 15 steps, keyboard and focus handling, draft-discard warning, no writes to stored data |
+| Accessibility | **Checked in Chromium** — keyboard navigation, focus order and capture, Escape, measured contrast sample. No WCAG conformance claim; real screen readers were not tested. |
+| Responsiveness | **Checked** — viewports 320–1920 px, reflow at 320×256, real browser zoom at 200% and 400% (DOM-geometry measurements; zoomed screenshots unreliable) |
+| Browser compatibility | **Chromium validated.** Firefox and WebKit **not tested** — compatible Playwright binaries were unavailable (BLOCKED, zero scenarios executed). Safari and physical devices not verified. |
+| Performance | **Measured in lab** — median FCP 96–128 ms / LCP 384–408 ms on direct cold loads; common interactions under 100 ms; CPU 4× + Fast 3G ≈3.5 s to interactive. Transfer totals are partial (fonts were excluded by the collector in those runs); not field or Core Web Vitals data. |
+| Data durability | localStorage with schema validation, Web Locks for multi-tab writes, and **manual** JSON backup/import (full replacement, 5 MiB limit). No automatic recovery if browser data is cleared. |
 | Hosted deployment | **Not published** |
 
 ### Next up
 
-- Complete the integrated regression across the remaining scenarios (multi-tab conflicts, backup import/export round-trips).
-- Validate Firefox and WebKit, plus keyboard, focus, and screen-reader behavior.
-- Measure runtime and transfer performance instead of inferring from bundle sizes.
+- Validate Firefox and WebKit once compatible browser binaries are available; real screen readers and physical devices remain untested.
+- Extend the lab performance evidence with complete transfer weights (local fonts included) using the corrected collector.
 - Publish a hosted demo and link it here.
 
 ## Notes
@@ -166,7 +168,7 @@ Last verified on **10 November 2026**:
 - The Ledgerly dataset and the ProfResolve case are **fictional** and exist only to exercise the models. They are not real product results.
 - There is no multi-user mode, authentication, or synchronization. The app intentionally stops at a single-user, local workspace.
 - The Interactive Case keeps its state in the component only; it does not modify the workspace.
-- Documentation for individual development stages is kept locally and is not part of the public repository.
+- Documentation for individual development stages is kept locally and is not part of the public repository. The guided tour reference ([`docs/PRODUCT-GUIDED-TOUR.md`](docs/PRODUCT-GUIDED-TOUR.md)), the readiness summary ([`docs/PRODUCT-READINESS-SUMMARY.md`](docs/PRODUCT-READINESS-SUMMARY.md)), and the browser-testing guide ([`docs/BROWSER-TESTING-GUIDE.md`](docs/BROWSER-TESTING-GUIDE.md)) are kept in `docs/` alongside the code.
 
 ---
 

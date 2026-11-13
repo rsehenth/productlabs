@@ -42,7 +42,7 @@ export function Notice({ tone, children, onDismiss, tabIndex }: NoticeProps) {
       className={cn('flex items-start gap-3 rounded-xl border px-4 py-3', className)}
     >
       <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-      <div className="min-w-0 flex-1 space-y-1 text-sm leading-relaxed">{children}</div>
+      <div className="min-w-0 flex-1 space-y-1 text-sm leading-relaxed wrap-anywhere">{children}</div>
       {onDismiss ? (
         <Button variant="ghost" size="icon" aria-label={t('Dispensar aviso')} onClick={onDismiss}>
           <X aria-hidden="true" />

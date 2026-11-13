@@ -56,12 +56,13 @@ export function Dialog({
             ;(usable ? opener : document.querySelector<HTMLElement>('main'))?.focus()
           }}
           className={cn(
-            'fixed left-1/2 top-1/2 z-50 flex max-h-[90vh] w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl',
+            'fixed left-1/2 top-1/2 z-50 flex max-h-[90vh] w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl [@media(max-height:32rem)]:overflow-y-auto border border-border bg-card shadow-2xl',
             className,
           )}
         >
           <div className="flex items-start justify-between gap-4 border-b border-border/70 p-5">
-            <div className="min-w-0 space-y-1 wrap-anywhere">
+            {/* Descrição longa: rola aqui em vez de empurrar o corpo e o rodapé para fora. Em altura < 32rem (zoom alto, paisagem) o diálogo inteiro rola. */}
+            <div className="max-h-[35vh] min-w-0 space-y-1 overflow-y-auto wrap-anywhere [@media(max-height:32rem)]:max-h-none">
               <DialogPrimitive.Title className="text-base font-semibold text-foreground">
                 {title}
               </DialogPrimitive.Title>
@@ -75,7 +76,7 @@ export function Dialog({
               </Button>
             </DialogPrimitive.Close>
           </div>
-          <div className="flex-1 space-y-4 overflow-y-auto p-5">
+          <div className="flex-1 space-y-4 overflow-y-auto p-5 [@media(max-height:32rem)]:flex-none [@media(max-height:32rem)]:overflow-visible">
             <StaleNotice />
             {workspace ? <StorageAlert status={workspace.status} /> : null}
             {children}

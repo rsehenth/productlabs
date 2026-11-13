@@ -180,7 +180,7 @@ export function FeedbackFormDialog({
         </div>
 
         <fieldset
-          className="space-y-2"
+          className="min-w-0 space-y-2"
           aria-invalid={Boolean(fieldErrors.metricIds)}
           tabIndex={fieldErrors.metricIds ? -1 : undefined}
           aria-describedby={fieldErrors.metricIds ? 'feedback-metrics-error' : undefined}

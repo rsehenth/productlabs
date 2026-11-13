@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -60,6 +60,9 @@ export function InteractiveCasePage() {
   const [hypothesis, setHypothesis] = useState('')
   const [decisionOptionId, setDecisionOptionId] = useState<string | null>(null)
   const [summaryVisible, setSummaryVisible] = useState(false)
+  const [summaryRequest, setSummaryRequest] = useState(0)
+  const summaryTitleRef = useRef<HTMLHeadingElement>(null)
+  const focusSummaryOnRender = useRef(false)
 
   const selected = selectCaseMetricView(CASE_METRIC_VIEWS, selectedId)
   const selectedEvidence = selectCaseEvidence(CASE_FEEDBACK_VIEWS, selectedFeedbackIds)
@@ -86,6 +89,20 @@ export function InteractiveCasePage() {
   function removeEvidence(feedbackId: string) {
     setSelectedFeedbackIds((previous) => removeCaseEvidenceId(previous, feedbackId))
   }
+
+  // Foco no título da síntese: descobre o novo conteúdo sem anúncio duplicado.
+  // Sem requisitos completos, a mensagem tem role="alert" e já é anunciada.
+  function revealSummary() {
+    focusSummaryOnRender.current = summaryContent !== null
+    setSummaryVisible(true)
+    setSummaryRequest((current) => current + 1)
+  }
+
+  useEffect(() => {
+    if (summaryRequest === 0 || !focusSummaryOnRender.current) return
+    focusSummaryOnRender.current = false
+    summaryTitleRef.current?.focus()
+  }, [summaryRequest])
 
   return (
     <>
@@ -201,7 +218,9 @@ export function InteractiveCasePage() {
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button onClick={() => setSummaryVisible(true)}>{t('Ver síntese da minha decisão')}</Button>
+        <Button onClick={revealSummary} aria-controls="case-decision-summary">
+          {t('Ver síntese da minha decisão')}
+        </Button>
         <p className="text-xs leading-relaxed text-muted-foreground">
           {t(
             'A síntese exige uma hipótese com pelo menos 15 caracteres, uma evidência selecionada e uma alternativa escolhida.',
@@ -213,6 +232,7 @@ export function InteractiveCasePage() {
         <CaseDecisionSummary
           summary={summaryContent}
           missingMessages={caseDecisionRequirementMessages(missingRequirements)}
+          titleRef={summaryTitleRef}
         />
       ) : null}
     </>

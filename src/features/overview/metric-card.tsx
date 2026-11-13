@@ -43,7 +43,7 @@ export function MetricCard({
             {METRIC_UNIT_LABELS[metric.unit]}
           </Badge>
         </div>
-        <p className="line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
+        <p className="line-clamp-2 text-[13px] leading-relaxed wrap-anywhere text-muted-foreground">
           {metric.description || t('Sem descrição registrada.')}
         </p>
       </CardHeader>

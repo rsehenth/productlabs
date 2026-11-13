@@ -437,7 +437,7 @@ export function MetricDetailDialog({
           >
             {t('Evidências vinculadas')}
           </h2>
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 wrap-anywhere md:grid-cols-2">
             <div className="rounded-xl border border-border p-4">
               <h3 className="text-sm font-medium text-foreground">
                 {t('Feedbacks')}{' '}

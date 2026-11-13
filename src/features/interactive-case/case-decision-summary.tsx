@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ReactNode, Ref } from 'react'
 import { CaseKindTag } from '@/features/interactive-case/case-kind-tag'
 import { Card, CardContent } from '@/components/ui/card'
 import { Notice } from '@/components/ui/notice'
@@ -8,6 +8,8 @@ import type { CaseDecisionSummaryContent } from '@/features/interactive-case/cas
 interface CaseDecisionSummaryProps {
   summary: CaseDecisionSummaryContent | null
   missingMessages: readonly string[]
+  /** Título focável: recebe o foco quando a síntese é revelada. */
+  titleRef?: Ref<HTMLHeadingElement>
 }
 
 const PM_NOTE =
@@ -36,13 +38,22 @@ function SummaryBlock({
   )
 }
 
-export function CaseDecisionSummary({ summary, missingMessages }: CaseDecisionSummaryProps) {
+export function CaseDecisionSummary({ summary, missingMessages, titleRef }: CaseDecisionSummaryProps) {
   const { t } = useLanguage()
   if (summary === null) {
     if (missingMessages.length === 0) return null
     return (
-      <section aria-labelledby="case-decision-summary-title" className="space-y-3">
-        <h2 id="case-decision-summary-title" className="text-lg font-semibold text-foreground">
+      <section
+        id="case-decision-summary"
+        aria-labelledby="case-decision-summary-title"
+        className="space-y-3"
+      >
+        <h2
+          id="case-decision-summary-title"
+          ref={titleRef}
+          tabIndex={-1}
+          className="text-lg font-semibold text-foreground"
+        >
           {t('Sua decisão de produto')}
         </h2>
         <Notice tone="error">
@@ -59,10 +70,19 @@ export function CaseDecisionSummary({ summary, missingMessages }: CaseDecisionSu
   }
 
   return (
-    <section aria-labelledby="case-decision-summary-title" className="space-y-3">
+    <section
+      id="case-decision-summary"
+      aria-labelledby="case-decision-summary-title"
+      className="space-y-3"
+    >
       <div className="space-y-1">
         <CaseKindTag kind="choice" note={t('dentro do cenário demonstrativo')} />
-        <h2 id="case-decision-summary-title" className="text-lg font-semibold text-foreground">
+        <h2
+          id="case-decision-summary-title"
+          ref={titleRef}
+          tabIndex={-1}
+          className="text-lg font-semibold text-foreground"
+        >
           {t('Sua decisão de produto')}
         </h2>
       </div>
