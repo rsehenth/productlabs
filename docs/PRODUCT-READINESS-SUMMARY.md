@@ -1,13 +1,13 @@
 # Product Decision Lab — prontidão da versão atual
 
-Consolidação em **13/11/2026**, com execuções entre 10 e 12/11. Aplicável à árvore local, que difere do HEAD `95519585d183600c946f74c272b650b71d1e132a`.
+Consolidação em **13/11/2026**, com execuções entre 10 e 12/11; atualização editorial em **14/11/2026**. Versão commitada localmente na branch `main` em `7547d1fd0d368f3d685dd268cba2b2f56c52e973` (`fix: finalize ProductDecisionLab demo readiness`, 25 arquivos). Nenhum push ou publicação remota foi realizado no fechamento local.
 
 O Product Decision Lab é um portfólio funcional de Product Management em React, TypeScript e Vite. Conecta métricas, feedbacks, hipóteses e decisões num workspace local, com datasets fictícios. Não possui backend, autenticação ou sincronização.
 
 | Decisão | Classificação |
 | --- | --- |
 | Apresentação profissional / portfólio PM, PO e Technical PM | **READY WITH LIMITATIONS** |
-| Publicação ou compartilhamento do repositório | **READY WITH ACTIONS** |
+| Publicação ou compartilhamento do repositório | **READY WITH LIMITATIONS — pronto para decisão de publicação** |
 | Produção comercial | **NOT READY** |
 
 **Achados abertos: 0 P0, 0 P1, 1 P2, 2 P3** — estado após a 4C.5e.1 (a auditoria 4C.5d.3 registrava 2 P2 e 3 P3). **AUD-P2-01 segue aberto, mitigado:** o coletor de performance foi corrigido e autoverificado, mas o encerramento exige execução integrada nova que valide a saída corrigida; o JSON histórico não foi reprocessado. **AUD-P3-02** (UX menor do tour) e **AUD-P3-03** (`m[1])`) permanecem abertos por decisão. **AUD-P2-02** (reprodutibilidade documentada no guia de testes de navegador) e **AUD-P3-01** (documentação pública atualizada) foram encerrados na 4C.5e.1. Afetam evidência, reprodução, UX menor do tour e organização. Ausência de defeito observado não garante ausência de defeitos.
@@ -45,12 +45,14 @@ Transferências são **parciais**: os números acima vêm do coletor das execuç
 
 **Correções obrigatórias antes de demonstrar: nenhuma comprovada.** Respeitar os limites acima.
 
-Ações já concluídas na 4C.5e.1 (antes listadas como pendentes): README, nota de zoom do guia e atribuição de Testing Library corrigidos; Playwright e binários externos documentados em [BROWSER-TESTING-GUIDE.md](BROWSER-TESTING-GUIDE.md), fora das dependências e de `npm test`; exceções no `.gitignore` tornaram este resumo, o tour e o guia **elegíveis para Git — elegível não é commitado: nenhum dos três está em commit**.
+Ações já concluídas na 4C.5e.1 (antes listadas como pendentes): README, nota de zoom do guia e atribuição de Testing Library corrigidos; Playwright e binários externos documentados em [BROWSER-TESTING-GUIDE.md](BROWSER-TESTING-GUIDE.md), fora das dependências e de `npm test`; exceções no `.gitignore` permitiram versionar este resumo, o tour e o guia. **Os três documentos públicos já constam no commit local `7547d1f`, concluído na 4C.5e.2b.**
+
+**Fechamento Git concluído na 4C.5e.2b:** os 25 candidatos, incluindo os três documentos públicos e os sete scripts de navegador, foram commitados localmente; a revisão dos quatro artefatos Graphify e os quality gates direcionados foram aprovados. Publicação remota continua sujeita a decisão e autorização separadas.
 
 Antes do compartilhamento profissional do repositório, recomenda-se:
 
-1. Realizar o commit autorizado dos 25 candidatos, incluindo os três documentos públicos hoje não rastreados e os sete scripts de navegador.
+1. Decidir sobre a publicação remota, considerando os limites e os metadados de autoria/coautoria do commit local; publicar exige autorização específica.
 2. Encerrar AUD-P2-01 com execução integrada do coletor corrigido (fontes em voo e cache); até lá, preservar as ressalvas WOFF2/CLS e os JSON históricos sem reescrita.
-3. Manter relatórios, evidências, caches e `m[1])` locais, fora da seleção; revisar os quatro artefatos Graphify rastreados.
+3. Manter relatórios, evidências, caches e `m[1])` locais, fora de qualquer seleção futura para publicação. `m[1])` permanece não rastreado (AUD-P3-03); a revisão Graphify já foi concluída.
 
-Sem mudança de código, instalação, commit, push ou deploy. Não foram reexecutados os gates históricos nem validados outros motores, leitor de tela, dispositivos físicos ou operação comercial.
+Esta atualização é exclusivamente editorial, após o commit local da 4C.5e.2b; não altera código nem acrescenta evidência funcional. Sem instalação, push ou deploy. Não foram reexecutados os gates históricos nem validados outros motores, leitor de tela, dispositivos físicos ou operação comercial.
