@@ -71,3 +71,6 @@ graphify-out/.graphify_*
 graphify-out/cost.json
 graphify-out/.graphify_python
 graphify-out/.graphify_uncached.txt
+
+# Artefato local sem função, resultado de redirecionamento de shell (preservado apenas no disco)
+/m\[1\])

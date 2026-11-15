@@ -1,16 +1,20 @@
 # Product Decision Lab — prontidão da versão atual
 
-Consolidação em **13/11/2026**, com execuções entre 10 e 12/11; atualização editorial em **14/11/2026**. Versão commitada localmente na branch `main` em `7547d1fd0d368f3d685dd268cba2b2f56c52e973` (`fix: finalize ProductDecisionLab demo readiness`, 25 arquivos). Nenhum push ou publicação remota foi realizado no fechamento local.
+Consolidação em **13/11/2026**, com execuções entre 10 e 12/11; atualizações editoriais em **14/11/2026** e em **15/11/2026** (revisão 4C.5f.2). Versão funcional commitada na branch `main` em `7547d1fd0d368f3d685dd268cba2b2f56c52e973` (`fix: finalize ProductDecisionLab demo readiness`, 25 arquivos). O push, porém, ocorreu depois do fechamento local.
+
+**Estado do Git (verificado em 15/11/2026, etapa 4C.5f.1).** O repositório **não está apenas commitado localmente**. O reflog de `refs/remotes/origin/main` registra cinco operações `update by push`; o `HEAD` auditado é `56dee8ef296a029856f2e9b790c767de4aa072b0` (`novo`), commitado depois de `7547d1f` e de `0c3bd93`, e `origin/main` aponta para esse mesmo `HEAD`. A visibilidade pública do repositório no GitHub **não foi consultada diretamente e não é afirmada aqui**.
+
+O arquivo `m[1])` foi **rastreado e enviado ao remoto** no commit `56dee8e`, ao contrário do que este resumo afirmava antes. A revisão **4C.5f.2** (15/11/2026) retirou-o do índice Git, preservou o arquivo físico e criou uma regra de `.gitignore` para ele; o objeto `m[1])` continua existindo no histórico já publicado. Essas correções são **locais e não publicadas**: nenhuma alteração desta revisão foi enviada ao remoto.
 
 O Product Decision Lab é um portfólio funcional de Product Management em React, TypeScript e Vite. Conecta métricas, feedbacks, hipóteses e decisões num workspace local, com datasets fictícios. Não possui backend, autenticação ou sincronização.
 
 | Decisão | Classificação |
 | --- | --- |
 | Apresentação profissional / portfólio PM, PO e Technical PM | **READY WITH LIMITATIONS** |
-| Publicação ou compartilhamento do repositório | **READY WITH LIMITATIONS — pronto para decisão de publicação** |
+| Publicação ou compartilhamento do repositório | **HISTÓRICO JÁ PUBLICADO NO REMOTO** — há push comprovado; a visibilidade no GitHub não foi confirmada; o histórico contém documentação interna e o arquivo `m[1])` |
 | Produção comercial | **NOT READY** |
 
-**Achados abertos: 0 P0, 0 P1, 1 P2, 2 P3** — estado após a 4C.5e.1 (a auditoria 4C.5d.3 registrava 2 P2 e 3 P3). **AUD-P2-01 segue aberto, mitigado:** o coletor de performance foi corrigido e autoverificado, mas o encerramento exige execução integrada nova que valide a saída corrigida; o JSON histórico não foi reprocessado. **AUD-P3-02** (UX menor do tour) e **AUD-P3-03** (`m[1])`) permanecem abertos por decisão. **AUD-P2-02** (reprodutibilidade documentada no guia de testes de navegador) e **AUD-P3-01** (documentação pública atualizada) foram encerrados na 4C.5e.1. Afetam evidência, reprodução, UX menor do tour e organização. Ausência de defeito observado não garante ausência de defeitos.
+**Achados abertos: 0 P0, 0 P1, 1 P2, 2 P3** — estado após a 4C.5e.1 (a auditoria 4C.5d.3 registrava 2 P2 e 3 P3). **AUD-P2-01 segue aberto, mitigado:** o coletor de performance foi corrigido e autoverificado, mas o encerramento exige execução integrada nova que valide a saída corrigida; o JSON histórico não foi reprocessado. **AUD-P3-02** (UX menor do tour) permanece aberto por decisão; **AUD-P3-03** (`m[1])`) foi tratado em parte na 4C.5f.2 — retirado do índice e ignorado, mas ainda presente no histórico publicado. **AUD-P2-02** (reprodutibilidade documentada no guia de testes de navegador) e **AUD-P3-01** (documentação pública atualizada) foram encerrados na 4C.5e.1. Afetam evidência, reprodução, UX menor do tour e organização. Ausência de defeito observado não garante ausência de defeitos.
 
 ## O que está implementado
 
@@ -47,12 +51,12 @@ Transferências são **parciais**: os números acima vêm do coletor das execuç
 
 Ações já concluídas na 4C.5e.1 (antes listadas como pendentes): README, nota de zoom do guia e atribuição de Testing Library corrigidos; Playwright e binários externos documentados em [BROWSER-TESTING-GUIDE.md](BROWSER-TESTING-GUIDE.md), fora das dependências e de `npm test`; exceções no `.gitignore` permitiram versionar este resumo, o tour e o guia. **Os três documentos públicos já constam no commit local `7547d1f`, concluído na 4C.5e.2b.**
 
-**Fechamento Git concluído na 4C.5e.2b:** os 25 candidatos, incluindo os três documentos públicos e os sete scripts de navegador, foram commitados localmente; a revisão dos quatro artefatos Graphify e os quality gates direcionados foram aprovados. Publicação remota continua sujeita a decisão e autorização separadas.
+**Fechamento Git concluído na 4C.5e.2b:** os 25 candidatos — incluindo os três documentos públicos e os sete scripts de navegador adicionados naquele commit (o oitavo, `refinement-4b6b.cjs`, é anterior a ele) — foram commitados; a revisão dos quatro artefatos Graphify e os quality gates direcionados foram aprovados. A publicação remota **já foi realizada** depois desse fechamento, conforme o estado do Git registrado no topo deste documento; ela não está pendente de autorização.
 
 Antes do compartilhamento profissional do repositório, recomenda-se:
 
-1. Decidir sobre a publicação remota, considerando os limites e os metadados de autoria/coautoria do commit local; publicar exige autorização específica.
+1. Decidir como tratar o que **já foi publicado**: o histórico remoto contém 26 documentos internos e um caminho absoluto com nome de usuário local (auditoria 4C.5f.1). As alternativas são aceitar o histórico como está ou reescrevê-lo com force-push; nenhuma reescrita foi executada.
 2. Encerrar AUD-P2-01 com execução integrada do coletor corrigido (fontes em voo e cache); até lá, preservar as ressalvas WOFF2/CLS e os JSON históricos sem reescrita.
-3. Manter relatórios, evidências, caches e `m[1])` locais, fora de qualquer seleção futura para publicação. `m[1])` permanece não rastreado (AUD-P3-03); a revisão Graphify já foi concluída.
+3. Manter relatórios, evidências e caches locais, fora de qualquer seleção futura para publicação. `m[1])` saiu do índice na 4C.5f.2 e passou a ser ignorado, mas continua no histórico publicado (AUD-P3-03); a revisão Graphify já foi concluída.
 
-Esta atualização é exclusivamente editorial, após o commit local da 4C.5e.2b; não altera código nem acrescenta evidência funcional. Sem instalação, push ou deploy. Não foram reexecutados os gates históricos nem validados outros motores, leitor de tela, dispositivos físicos ou operação comercial.
+Esta atualização é editorial e de organização do repositório, posterior ao commit `56dee8e`; corrige afirmações desatualizadas sobre o estado do Git e a documentação dos scripts de navegador, sem alterar comportamento do produto nem acrescentar evidência funcional. Sem instalação, commit, push ou deploy nesta etapa. Não foram reexecutados os gates históricos nem validados outros motores, leitor de tela, dispositivos físicos ou operação comercial.

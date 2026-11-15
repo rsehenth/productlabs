@@ -144,7 +144,8 @@ export function parseBackupValue(input: unknown): BackupParseResult {
     }
   }
 
-  // Só no backup: dados já persistidos continuam legíveis (ver docs/WFA-02-DECISION-VALIDATION-FIX.md).
+  // Só na importação de backup: dados já persistidos continuam legíveis mesmo que não
+  // satisfaçam as exigências atuais de status.
   const decisionIssues = findIncompatibleDecisions(validation.value).flatMap((d) =>
     d.pendencies.map(
       (message) =>

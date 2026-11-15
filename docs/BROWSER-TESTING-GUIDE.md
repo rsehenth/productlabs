@@ -24,8 +24,20 @@ Como executar os scripts de regressão de navegador do Product Decision Lab. Ele
 | `tests/browser/4c5c2-zoom.cjs` | Zoom real do navegador (200%/400%) por perfil temporário; mede por DOM |
 | `tests/browser/4c5d1-compatibility.cjs` | Matriz de motores: Chromium, Firefox e WebKit |
 | `tests/browser/4c5d2-performance.cjs` | Carregamento, interações e performance com coleta de recursos |
+| `tests/browser/refinement-4b6b.cjs` | Refinamento 4B.6b: rascunhos em salvamento, exclusão pendente, conflito entre abas, foco no primeiro campo inválido e retorno de foco após ações inline |
 
 Todos usam exclusivamente dados fictícios e contextos isolados do navegador.
+
+`refinement-4b6b.cjs` é o mais antigo do conjunto e não segue o mesmo contrato dos demais: não tem cabeçalho de uso e usa **`http://127.0.0.1:4816`** como porta padrão de `PDL_BASE_URL` (os outros sete usam `4731`). Para executá-lo, suba o preview nessa porta:
+
+```bash
+npm run build
+npx vite preview --host 127.0.0.1 --port 4816 --strictPort
+set PLAYWRIGHT_MODULE=C:\caminho\para\node_modules\playwright
+node --test tests/browser/refinement-4b6b.cjs
+```
+
+Sem cabeçalho de contrato, os pré-requisitos são os das seções 3 a 5: Node compatível, `npm install` concluído, módulo Playwright externo em `PLAYWRIGHT_MODULE` e build de produção servido em loopback. O script abre e fecha um Chromium por teste (`chromium.launch()` em cada caso), portanto é mais lento que os demais.
 
 ## 3. Pré-requisitos
 
@@ -69,7 +81,7 @@ set PDL_SELF_CHECK=1&& node tests/browser/4c5d2-performance.cjs
 | Variável | Scripts | Função |
 | --- | --- | --- |
 | `PLAYWRIGHT_MODULE` | todos | Caminho do módulo Playwright externo |
-| `PDL_BASE_URL` | todos | Origem do preview (padrão `http://127.0.0.1:4731`) |
+| `PDL_BASE_URL` | todos | Origem do preview (padrão `http://127.0.0.1:4731`; `refinement-4b6b.cjs` usa `http://127.0.0.1:4816`) |
 | `PDL_RESULTS` | 4c5d2-performance, 4c5d1-compatibility, 4c5c2-responsive | Arquivo JSON de saída (padrões: `docs/evidence-4c5d2/results.json`, temporário do usuário, temporário do usuário) |
 | `PDL_ONLY` | 4c5d2-performance (cenários A–T), 4c5d1-compatibility (`chromium\|firefox\|webkit`), 4c5c2-responsive (perfil) | Executa apenas parte da suíte |
 | `PDL_REPETITIONS` | 4c5d2-performance | Repetições por carga (padrão 3) |
