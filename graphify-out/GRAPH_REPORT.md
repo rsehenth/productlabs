@@ -1,5 +1,7 @@
 # Graph Report - ProductDecisionLab  (2026-11-13)
 
+> **NOTA HISTÓRICA (acrescentada em 15/11/2026):** Este relatório é um **snapshot histórico** gerado em **13/11/2026**. A proveniência registrada abaixo aponta para o commit `95519585` (`95519585d183600c946f74c272b650b71d1e132a`), anterior ao HEAD atual — **não é necessariamente uma representação atualizada do HEAD**. Os dados estruturados completos (`graph.json`), o visualizador (`graph.html`) e o manifesto (`manifest.json`) foram **retirados do versionamento futuro** (removidos do índice Git e ignorados, mantidos fisicamente) e **podem continuar sendo utilizados localmente**. Este relatório **não representa uma validação manual integral da arquitetura**.
+
 ## Corpus Check
 - 151 files · ~92,523 words
 - Verdict: corpus is large enough that graph structure adds value.
